@@ -1,0 +1,9 @@
+hostname: irc.domain.tld
+port: 7000
+password_receive: password
+password_send: password
+
+rubyserv:
+  nickname: RubyServ
+  realname: Ruby IRC Services
+  hostname: services.int

@@ -1,4 +1,14 @@
+require 'yaml'
+require 'pathname'
+
 module RubyServ
-  VERSION  = File.read('../VERSION').strip
-  REVISION = `git log --pretty=format:'%h' -n 1`
+  def self.root
+    Pathname.new(File.dirname(__FILE__) + '/..').expand_path
+  end
+
+  def self.config
+    YAML.load_file("#{self.root}/etc/rubyserv.yml")
+  end
 end
+
+require_relative 'rubyserv/constants'
