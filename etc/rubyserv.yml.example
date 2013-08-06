@@ -7,6 +7,7 @@ link:
   protocol: ts6
   description: Ruby IRC Services
   reconnect_delay: 5
+  ssl: false
 
 rubyserv:
   nickname: RubyServ

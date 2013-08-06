@@ -8,6 +8,7 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     rake (10.1.0)
+    settingslogic (2.0.9)
     slop (3.4.6)
 
 PLATFORMS
@@ -16,3 +17,4 @@ PLATFORMS
 DEPENDENCIES
   pry
   rake
+  settingslogic

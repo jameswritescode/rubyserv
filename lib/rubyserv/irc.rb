@@ -14,7 +14,7 @@ class RubyServ::IRC
 
     socket = TCPSocket.new(server, port) # TODO: SSL
 
-    if RubyServ.config['link']['ssl'] == true
+    if RubyServ.config.link.ssl == true
       require 'openssl'
 
       context             = OpenSSL::SSL::SSLContext.new
