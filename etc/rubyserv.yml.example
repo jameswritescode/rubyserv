@@ -12,3 +12,4 @@ rubyserv:
   nickname: RubyServ
   realname: Ruby IRC Services
   hostname: services.int
+  channel: '#services'
