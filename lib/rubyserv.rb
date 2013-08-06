@@ -1,5 +1,7 @@
 require 'yaml'
 require 'pathname'
+require 'socket'
+require 'pry'
 
 module RubyServ
   def self.root
@@ -12,3 +14,5 @@ module RubyServ
 end
 
 require_relative 'rubyserv/constants'
+require_relative 'rubyserv/irc'
+require_relative 'rubyserv/protocols/ts6'
