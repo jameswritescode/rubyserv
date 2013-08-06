@@ -1,7 +1,12 @@
-hostname: irc.domain.tld
-port: 7000
-password_receive: password
-password_send: password
+link:
+  hostname: irc.domain.tld
+  port: 7000
+  password_receive: password
+  password_send: password
+  sid: RS0
+  protocol: ts6
+  description: Ruby IRC Services
+  reconnect_delay: 5
 
 rubyserv:
   nickname: RubyServ
