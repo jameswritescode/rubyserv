@@ -11,4 +11,4 @@ RubyServ. If there are services in the plugins directory, then it will also incl
 
 ### Acknowledgements
 
-This is inspired and largely based off (to start) by [somasonic's RServ](https://github.com/somasonic/RServ)
+This is inspired and largely based off (to start) by [somasonic's RServ](https://github.com/somasonic/RServ) and [dominikh's cinch](https://github.com/cinchrb/cinch)
