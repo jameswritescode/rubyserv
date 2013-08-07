@@ -8,3 +8,7 @@ This is also written to be TS6 compatible, specifically to work with [Charybdis]
 
 Configuring is meant to be straight-forward. It connects to an IRC server with the usual link configuration, then it connects
 RubyServ. If there are services in the plugins directory, then it will also include and connect those services.
+
+### Acknowledgements
+
+This is inspired and largely based off (to start) by [somasonic's RServ](https://github.com/somasonic/RServ)
