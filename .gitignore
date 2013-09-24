@@ -2,3 +2,5 @@ etc/rubyserv.yml
 log/*.log
 vendor
 .bundle
+Gemfile_local
+Gemfile.lock
