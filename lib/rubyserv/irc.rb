@@ -1,64 +1,55 @@
 class RubyServ::IRC
-  attr_accessor :server, :port, :connected, :buffer
+  attr_reader :protocol
 
   def initialize(server, port)
-    self.server = server
-    self.port   = port
-    self.buffer = []
+    @server    = server
+    @port      = port
+    @buffer    = []
+    @connected = false
 
     start
+  rescue NameError
+    puts "Invalid protocol: #{RubyServ.config.link.protocol}"
   end
 
   def start
-    return socket if connected
+    create_socket
+    define_protocol
+    connect_to_irc
+  end
 
-    socket = TCPSocket.new(server, port) # TODO: SSL
+  def create_socket
+    return @socket if @connected
 
-    if RubyServ.config.link.ssl == true
+    @socket = TCPSocket.new(@server, @port)
+
+    if RubyServ.config.link.ssl
       require 'openssl'
 
       context             = OpenSSL::SSL::SSLContext.new
       context.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      socket            = OpenSSL::SSL::SSLSocket.new(socket, context)
-      socket.sync_close = true
-      socket.connect
+      @socket            = OpenSSL::SSL::SSLSocket.new(socket, context)
+      @socket.sync_close = true
+      @socket.connect
     end
   end
 
-  def on_link_start(link)
-    if link == self
-      connected = true
+  def define_protocol
+    @protocol = Kernel.const_get("RubyServ::Protocol::#{RubyServ.config.link.protocol}").new(@socket)
+  end
 
-      Thread.new { main_loop }
+  def connect_to_irc
+    @protocol.authenticate
 
-      @buffer.each { |msg| send(msg) }
-    else
-      socket.close if socket
-      connected = false
+    while true
+      puts @socket.gets
     end
   end
 
   def send(text)
-    if connected
-      socket.puts text.chomp
-    else
-      buffer << text
-    end
-  end
+    puts ">> #{text}"
 
-  def main_loop
-    while connected
-      begin
-        x = socket.gets
-
-        raise 'Disconnected' if x.nil?
-      rescue 'Disconnected'
-        connected = false
-        socket.close
-        socket = nil
-        buffer.clear
-      end
-    end
+    @socket.puts text
   end
 end

@@ -7,7 +7,7 @@ class RubyServ::Event
     @events << [object, method, name.downcase]
   end
 
-  def del(object, method, name)
+  def delete(object, method, name)
     @events.delete [object, method, name.downcase]
   end
 
