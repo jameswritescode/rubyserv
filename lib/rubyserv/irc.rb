@@ -4,18 +4,18 @@ class RubyServ::IRC
   def initialize(server, port)
     @server    = server
     @port      = port
-    @buffer    = []
     @connected = false
 
     start
-  rescue NameError
-    puts "Invalid protocol: #{RubyServ.config.link.protocol}"
+  rescue NameError => ex
+    puts ex
   end
 
   def start
     create_socket
     define_protocol
-    connect_to_irc
+    Thread.new { connect_to_irc }
+    binding.pry
   end
 
   def create_socket
@@ -43,13 +43,21 @@ class RubyServ::IRC
     @protocol.authenticate
 
     while true
-      puts @socket.gets
+      output = @socket.gets.strip
+
+      puts "#{output}\r\n"
+
+      @protocol.verify_authentication(output)
+      @protocol.handle_server(output)
+      @protocol.handle_user(output)
+      @protocol.handle_channel(output)
+      @protocol.pong(output)
     end
   end
 
   def send(text)
     puts ">> #{text}"
 
-    @socket.puts text
+    @socket.puts "#{text}\r"
   end
 end

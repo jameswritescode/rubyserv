@@ -12,6 +12,9 @@ require_relative 'rubyserv/configuration'
 require_relative 'rubyserv/logger'
 require_relative 'rubyserv/protocol'
 require_relative 'rubyserv/irc'
+require_relative 'rubyserv/irc/user'
+require_relative 'rubyserv/irc/channel'
+require_relative 'rubyserv/irc/server'
 require_relative 'rubyserv/protocol/ts6'
 
 module RubyServ
