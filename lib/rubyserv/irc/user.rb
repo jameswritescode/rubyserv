@@ -1,5 +1,7 @@
 class RubyServ::IRC::User
-  attr_accessor :nickname, :hostname, :modes
+  include RubyServ::IRC::Helper
+
+  attr_accessor :nickname, :hostname, :modes, :ts
   attr_reader   :realname, :uid, :username, :sid
 
   @users = []
@@ -8,6 +10,7 @@ class RubyServ::IRC::User
     self.hostname = options[:hostname]
     self.nickname = options[:nickname]
     self.modes    = options[:modes].sub('+', '')
+    self.ts       = options[:ts]
 
     @realname = options[:realname]
     @username = options[:username]
@@ -21,7 +24,7 @@ class RubyServ::IRC::User
   end
 
   def server
-    RubyServ::IRC::Server.find(@sid).first
+    RubyServ::IRC::Server.find(@sid)
   end
 
   def channels
@@ -37,8 +40,8 @@ class RubyServ::IRC::User
       @users
     end
 
-    def find(id, method = :uid)
-      @users.select { |user| user.send(method) == id }
+    def find(id)
+      @users.find { |user| user.uid == id }
     end
   end
 end

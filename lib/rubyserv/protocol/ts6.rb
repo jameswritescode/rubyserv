@@ -31,12 +31,13 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   def handle_server(input)
     if input =~ /^(\S+ )?SERVER (\S+) (\d+) :(.*)/
       RubyServ::IRC::Server.create(
+        _1:          $1,
         name:        $2,
         sid:         $3,
         description: $4
       )
     elsif input =~ /^SQUIT (\S+) :(.*)$/
-      RubyServ::IRC::Server.find($1, :name).each { |server| server.destroy }
+      RubyServ::IRC::Server.find_by_name($1).each { |server| server.destroy }
     end
   end
 
@@ -51,7 +52,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         _1:       $1,
         nickname: $2,
         sid:      $3,
-        _2:       $4,
+        ts:       $4,
         modes:    $5,
         username: $6,
         hostname: $7,
@@ -60,16 +61,18 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         realname: $10
       )
     elsif input =~ /^:(\S+) QUIT :(.*)$/
-      RubyServ::IRC::User.find($1).first.destroy
+      RubyServ::IRC::User.find($1).destroy
     elsif input =~ /^:(\S+) NICK (\S+) :(.*)$/
-      RubyServ::IRC::User.find($1).nickname = $2
+      user          = RubyServ::IRC::User.find($1)
+      user.nickname = $2
+      user.ts       = $3
     elsif input =~ /^:(\S+) MODE (\S+) :(.*)$/
       nick, mode = $2, $3
-      modes = RubyServ::IRC::User.find(nick, :nickname).modes
+      modes = RubyServ::IRC::User.find_by_nickname(nick).first.modes
       modes += mode.sub('+', '') if mode.start_with?('+')
       modes = modes.sub(mode.sub('-', ''), '') if mode.start_with?('-')
 
-      RubyServ::IRC::User.find(nick, :nickname).modes = modes
+      RubyServ::IRC::User.find_by_nickname(nick).first.modes = modes
     elsif input =~ /^(\S+) ENCAP \* CHGHOST (\S+) :(.*)$/
       RubyServ::IRC::User.find($2).hostname = $3
     end
@@ -78,6 +81,13 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :42A SJOIN 1367622278 #channel +nrt :+42AAAAAYS @00AAAAAAC 42AAAAAAB
   def handle_channel(input)
     if input =~ /^:(\w{3}) SJOIN (\S+) (\S+) (\S+) :(.*)$/ # split $5 into array?
+      RubyServ::IRC::Channel.create(
+        sid:   $1,
+        ts:    $2,
+        name:  $3,
+        modes: $4,
+        users: $5
+      )
     end
   end
 end

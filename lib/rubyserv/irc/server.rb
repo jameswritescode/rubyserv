@@ -1,4 +1,6 @@
 class RubyServ::IRC::Server
+  include RubyServ::IRC::Helper
+
   attr_reader :sid, :name, :description
 
   @servers = []
@@ -10,7 +12,7 @@ class RubyServ::IRC::Server
   end
 
   def destroy
-    users = RubyServ::IRC::User.find(@sid, :sid)
+    users = RubyServ::IRC::User.find_by_sid(@sid).first
     users.each { |user| user.destroy }
 
     servers = self.class.instance_variable_get(:@servers)
@@ -30,8 +32,8 @@ class RubyServ::IRC::Server
       @servers
     end
 
-    def find(id, method = :sid)
-      @servers.select { |server| server.send(method) == id }
+    def find(id)
+      @servers.find { |server| server.sid == id }
     end
   end
 end
