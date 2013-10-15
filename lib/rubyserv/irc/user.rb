@@ -1,6 +1,4 @@
-class RubyServ::IRC::User
-  include RubyServ::IRC::Helper
-
+class RubyServ::IRC::User < RubyServ::IRC::Base
   attr_accessor :nickname, :hostname, :modes, :ts
   attr_reader   :realname, :uid, :username, :sid
 
@@ -31,13 +29,21 @@ class RubyServ::IRC::User
     RubyServ::IRC::Channel.all.select { |channel| channel.users.include?(@uid) }
   end
 
+  def oper?
+    modes.include?('o')
+  end
+
+  def admin?
+    modes.include?('a')
+  end
+
+  def hostmask
+    "#{nickname}!#{@username}@#{hostname}"
+  end
+
   class << self
     def create(options = {})
       @users << self.new(options)
-    end
-
-    def all
-      @users
     end
 
     def find(id)

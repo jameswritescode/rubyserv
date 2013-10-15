@@ -1,14 +1,23 @@
 class RubyServ::IRC
   attr_reader :protocol
 
+  @connected = false
+
   def initialize(server, port)
     @server    = server
     @port      = port
-    @connected = false
 
     start
   rescue NameError => ex
     puts ex
+  end
+
+  class << self
+    attr_writer :connected
+
+    def connected?
+      @connected
+    end
   end
 
   def start
@@ -19,8 +28,6 @@ class RubyServ::IRC
   end
 
   def create_socket
-    return @socket if @connected
-
     @socket = TCPSocket.new(@server, @port)
 
     if RubyServ.config.link.ssl
@@ -47,12 +54,35 @@ class RubyServ::IRC
 
       puts "#{output}\r\n"
 
-      @protocol.verify_authentication(output)
+      @protocol.handle_errors(output)
       @protocol.handle_server(output)
       @protocol.handle_user(output)
       @protocol.handle_channel(output)
-      @protocol.pong(output)
+      @protocol.handle_ping(output)
+      @protocol.handle_whois(output)
+
+      if self.class.connected? && !@clients_created
+        create_clients
+      end
     end
+  end
+
+  def create_clients
+    puts '>> Creating RubyServ and other clients'
+
+    RubyServ::IRC::Client.create(@socket,
+      nickname: RubyServ.config.rubyserv.nickname,
+      hostname: RubyServ.config.rubyserv.hostname,
+      username: RubyServ.config.rubyserv.username,
+      realname: RubyServ.config.rubyserv.realname,
+      modes:    'Sio'
+    )
+
+    RubyServ::IRC::Client.all.each do |client|
+      client.join(RubyServ.config.rubyserv.channel, true)
+    end
+
+    instance_variable_set(:@clients_created, true)
   end
 
   def send(text)

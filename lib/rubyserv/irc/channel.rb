@@ -1,11 +1,9 @@
-class RubyServ::IRC::Channel
-  include RubyServ::IRC::Helper
-
+class RubyServ::IRC::Channel < RubyServ::IRC::Base
   attr_accessor :modes, :user_list, :ts
   attr_reader   :sid, :name
 
   @channels = []
-  @statuses = [OWNER, ADMIN, OP, HALFOP, VOICE]
+  STATUSES = [RubyServ::OWNER, RubyServ::ADMIN, RubyServ::OP, RubyServ::HALFOP, RubyServ::VOICE]
 
   def initialize(options = {})
     # TODO: Update modes, user_list, and ts when changes are made to
@@ -20,10 +18,12 @@ class RubyServ::IRC::Channel
 
   def users
     clean = user_list.map do |user|
-      @statuses.each { |status| user.sub(status[:symbol], '') }
+      STATUSES.each { |status| user.sub!(status[:symbol], '') }
+
+      user
     end
 
-    clean.each { |user| RubyServ::IRC::User.find(user) }
+    clean.map { |user| RubyServ::IRC::User.find(user) }
   end
 
   def destroy
@@ -31,7 +31,7 @@ class RubyServ::IRC::Channel
     channels.delete_if { |channel| channel == self }
   end
 
-  [OWNER, ADMIN, OP, HALFOP, VOICE].each do |status|
+  STATUSES.each do |status|
     define_method("#{status[:name]}s") do
       users.select { |user| user.start_with?(status[:symbol]) }
     end
@@ -40,10 +40,6 @@ class RubyServ::IRC::Channel
   class << self
     def create(options = {})
       @channels << self.new(options)
-    end
-
-    def all
-      @channels
     end
 
     def find(id)

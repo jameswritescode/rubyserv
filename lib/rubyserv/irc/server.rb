@@ -1,6 +1,4 @@
-class RubyServ::IRC::Server
-  include RubyServ::IRC::Helper
-
+class RubyServ::IRC::Server < RubyServ::IRC::Base
   attr_reader :sid, :name, :description
 
   @servers = []
@@ -26,10 +24,6 @@ class RubyServ::IRC::Server
   class << self
     def create(options = {})
       @servers << self.new(options)
-    end
-
-    def all
-      @servers
     end
 
     def find(id)

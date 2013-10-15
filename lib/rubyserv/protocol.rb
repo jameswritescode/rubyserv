@@ -3,9 +3,9 @@ class RubyServ::Protocol
     @socket = socket
   end
 
-  [:authenticate, :create_clients, :ping,
-  :verify_authentication, :handle_server, :handle_user,
-  :handle_channel].each do |name|
+  [:authenticate, :handle_ping, :verify_authentication,
+   :handle_server, :handle_user, :handle_channel,
+   :handle_errors].each do |name|
     define_method(name) { |input| raise "##{name} must be defined in the protocol" }
   end
 

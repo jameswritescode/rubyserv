@@ -12,5 +12,6 @@ link:
 rubyserv:
   nickname: RubyServ
   realname: Ruby IRC Services
-  hostname: services.int
+  hostname: rubyservices.int
+  username: RubyServ
   channel: '#services'
