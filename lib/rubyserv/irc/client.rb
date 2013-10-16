@@ -2,7 +2,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   @clients  = []
   @base_uid = 0
 
-  attr_reader :nickname
+  attr_reader :uid
 
   def initialize(socket, options = {})
     @nickname = options[:nickname]

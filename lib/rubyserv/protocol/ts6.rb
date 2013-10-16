@@ -117,7 +117,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :42AAAAAAB WHOIS 0RSSR0001 :RubyServ
   def handle_whois(input)
     if input =~ /^:(\S+) WHOIS (\S+) :(.*)$/
-      RubyServ::IRC::Client.find_by_nickname($3).first.whois($1)
+      RubyServ::IRC::Client.find_by_uid($2).first.whois($1)
     end
   end
 end
