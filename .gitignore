@@ -4,3 +4,6 @@ vendor
 .bundle
 Gemfile_local
 Gemfile.lock
+
+plugins/*
+!plugins/rubyserv*
