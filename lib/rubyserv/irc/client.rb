@@ -63,6 +63,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   def send_raw(text)
     puts ">> #{text}"
 
+    sleep(0.05)
     @socket.puts "#{text}\r"
   end
 

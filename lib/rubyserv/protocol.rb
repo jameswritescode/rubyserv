@@ -5,13 +5,14 @@ class RubyServ::Protocol
 
   [:authenticate, :handle_ping, :verify_authentication,
    :handle_server, :handle_user, :handle_channel,
-   :handle_errors].each do |name|
+   :handle_errors, :handle_whois].each do |name|
     define_method(name) { |input| raise "##{name} must be defined in the protocol" }
   end
 
-  def send(text)
+  def send_raw(text)
     puts ">> #{text}"
 
+    sleep(0.05)
     @socket.puts "#{text}\r"
   end
 end

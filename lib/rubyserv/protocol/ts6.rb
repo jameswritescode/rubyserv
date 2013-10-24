@@ -1,8 +1,8 @@
 class RubyServ::Protocol::TS6 < RubyServ::Protocol
   def authenticate
-    send("PASS #{RubyServ.config.link.password_send} TS 6 :#{RubyServ.config.link.sid}")
-    send('CAPAB :QS ENCAP SAVE RSFNC SERVICES REMOVE')
-    send("SERVER #{RubyServ.config.rubyserv.hostname} 0 :#{RubyServ.config.link.description}")
+    send_raw("PASS #{RubyServ.config.link.password_send} TS 6 :#{RubyServ.config.link.sid}")
+    send_raw('CAPAB :QS ENCAP SAVE RSFNC SERVICES REMOVE')
+    send_raw("SERVER #{RubyServ.config.rubyserv.hostname} 0 :#{RubyServ.config.link.description}")
   end
 
   # ERROR :Closing Link: 127.0.0.1 (Invalid servername.)
@@ -29,11 +29,11 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :services.int PING services.int :rubyserv.int
   def handle_ping(input)
     if input =~ /^PING :(.*)$/
-      send("PONG :#{$1}")
+      send_raw("PONG :#{$1}")
 
       RubyServ::IRC.connected = true unless RubyServ::IRC.connected?
     elsif input =~ /^:(\S+) PING (\S+) :(.*)$/
-      send(":#{$3} PONG #{$3} :#{$1}")
+      send_raw(":#{$3} PONG #{$3} :#{$1}")
     end
   end
 
@@ -57,7 +57,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   end
 
   def send_svinfo
-    send("SVINFO 6 6 0 :#{Time.now.to_i}")
+    send_raw("SVINFO 6 6 0 :#{Time.now.to_i}")
   end
 
   # :00A UID HelpServ 2 1373344541 +Sio HelpServ services.int 0 00AAAAAAG :Help Services
