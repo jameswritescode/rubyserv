@@ -2,7 +2,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   @clients  = []
   @base_uid = 0
 
-  attr_reader :uid
+  attr_reader :uid, :nickname
 
   def initialize(socket, options = {})
     @nickname = options[:nickname]
@@ -19,6 +19,15 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     send_raw(":#{RubyServ.config.link.sid} UID #{@nickname} 0 0 +#{@modes} #{@username} #{@hostname} 0 #{@uid} :#{@realname}")
   end
 
+  def nick=(new_nick)
+    if RubyServ::IRC::User.find_by_nickname(new_nick).empty?
+      @nickname = new_nick
+      send_raw(":#{@uid} NICK #{@nickname} #{Time.now.to_i}")
+    else
+      puts ">> Nickname #{new_nick} is already taken"
+    end
+  end
+
   def join(channel, op = false)
     send_raw(":#{@uid} JOIN #{Time.now.to_i} #{channel} +")
 
@@ -26,12 +35,19 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   def part(channel, message = 'Leaving channel')
+    send_raw(":#{@uid} PART #{channel} :#{message}")
   end
 
-  def notice(target)
+  def notice(target, message)
+    send_raw(":#{@uid} NOTICE #{target} :#{message}")
   end
 
-  def message(target)
+  def message(target, message)
+    send_raw(":#{@uid} PRIVMSG #{target} :#{message}")
+  end
+
+  def action(target, message)
+    send_raw(":#{@uid} PRIVMSG #{target} :\x01ACTION #{message}\x01")
   end
 
   def quit(message = 'RubyServ shutdown')
