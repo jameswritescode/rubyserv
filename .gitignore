@@ -5,5 +5,5 @@ vendor
 Gemfile_local
 Gemfile.lock
 
-plugins/*
-!plugins/rubyserv*
+plugins
+!plugins/rubyserv.rb
