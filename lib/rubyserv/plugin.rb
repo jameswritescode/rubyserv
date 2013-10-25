@@ -37,6 +37,8 @@ module RubyServ::Plugin
     end
 
     def match(pattern, options = {}, &block)
+      options = { prefix: true }.merge(options)
+
       @matchers << [pattern, options, block]
     end
 
@@ -44,7 +46,7 @@ module RubyServ::Plugin
       if input =~ /^:(\S+) PRIVMSG (\S+) :(.*)$/
         input = OpenStruct.new(user: $1, target: $2, message: $3)
 
-        @matchers.each do |matcher|
+        get_matchers_for(input.message).each do |matcher|
           if match = input.message.match(matcher.first)
             message = RubyServ::Message.new(input, service: @nickname)
             params  = match.captures
@@ -53,6 +55,18 @@ module RubyServ::Plugin
           end
         end
       end
+    end
+
+    def get_matchers_for(message)
+      if prefix_used?(message)
+        @matchers.select { |matcher| matcher[1][:prefix] }
+      else
+        @matchers.select { |matcher| !matcher[1][:prefix] }
+      end
+    end
+
+    def prefix_used?(message)
+      message.start_with?(RubyServ.config.rubyserv.prefix) || message =~ /^#{@nickname}(\W|_)/
     end
 
     def connected?
