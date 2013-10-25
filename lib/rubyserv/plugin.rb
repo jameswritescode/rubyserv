@@ -3,6 +3,7 @@ module RubyServ::Plugin
     RubyServ::PLUGINS << klass
 
     klass.send(:extend, ClassMethods)
+    klass.send(:extend, klass)
   end
 
   module ClassMethods

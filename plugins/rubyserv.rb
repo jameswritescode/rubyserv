@@ -1,4 +1,4 @@
-class Core
+module Core
   include RubyServ::Plugin
 
   configure do |config|
@@ -13,6 +13,10 @@ class Core
   end
 
   match(/say (.*)/) do |m, message|
-    puts "#{message}"
+    msg(message)
+  end
+
+  def msg(message)
+    puts message
   end
 end
