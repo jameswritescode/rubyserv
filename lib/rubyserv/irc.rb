@@ -69,21 +69,25 @@ class RubyServ::IRC
     puts '>> Creating RubyServ and other clients'
 
     RubyServ::PLUGINS.each do |plugin|
-      RubyServ::IRC::Client.create(@socket,
-        nickname: plugin.nickname,
-        hostname: plugin.hostname,
-        username: plugin.username,
-        realname: plugin.realname,
-        modes:    'Sio'
-      )
-
-      plugin.channels.each do |channel|
-        RubyServ::IRC::Client.find_by_nickname(plugin.nickname).first.join(channel, true)
-      end
-
-      plugin.connected = true
+      create_client(plugin)
     end
 
     instance_variable_set(:@clients_created, true)
+  end
+
+  def create_client(plugin)
+    RubyServ::IRC::Client.create(@socket,
+      nickname: plugin.nickname,
+      hostname: plugin.hostname,
+      username: plugin.username,
+      realname: plugin.realname,
+      modes:    'Sio'
+    )
+
+    plugin.channels.each do |channel|
+      RubyServ::IRC::Client.find_by_nickname(plugin.nickname).first.join(channel, true)
+    end
+
+    plugin.connected = true
   end
 end
