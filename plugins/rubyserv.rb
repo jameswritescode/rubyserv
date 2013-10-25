@@ -7,16 +7,4 @@ module Core
     config.hostname = RubyServ.config.rubyserv.hostname
     config.username = RubyServ.config.rubyserv.username
   end
-
-  match(/hello/) do |m|
-    puts 'someone said hello!'
-  end
-
-  match(/say (.*)/) do |m, message|
-    msg(message)
-  end
-
-  def msg(message)
-    puts message
-  end
 end
