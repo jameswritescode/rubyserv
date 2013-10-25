@@ -3,9 +3,9 @@ class RubyServ::IRC
 
   @connected = false
 
-  def initialize(server, port)
-    @server    = server
-    @port      = port
+  def initialize(link_config)
+    @server = link_config.hostname
+    @port   = link_config.port
 
     start
   rescue NameError => ex

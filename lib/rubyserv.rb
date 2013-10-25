@@ -29,6 +29,6 @@ end
 
 module RubyServ
   def self.start!
-    RubyServ::IRC.new(RubyServ.config.link.hostname, RubyServ.config.link.port)
+    RubyServ::IRC.new(RubyServ.config.link)
   end
 end
