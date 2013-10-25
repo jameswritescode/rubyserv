@@ -9,13 +9,18 @@ module RubyServ::Plugin
   module ClassMethods
     attr_accessor :realname, :nickname, :hostname, :username
     attr_reader   :matchers
-    attr_writer   :connected, :channels
+    attr_writer   :connected
 
     def self.extended(klass)
       klass.instance_exec do
         @matchers  = []
-        @channels  = []
+
         @connected = false
+
+        @hostname = RubyServ.config.rubyserv.hostname
+        @username = RubyServ.config.rubyserv.username
+        @realname = RubyServ.config.rubyserv.realname
+        @channels = [RubyServ.config.rubyserv.channel]
       end
     end
 
@@ -24,10 +29,11 @@ module RubyServ::Plugin
     end
 
     def channels
-      schan = RubyServ.config.rubyserv.channel
-
-      @channels << schan unless @channels.include?(schan)
       @channels
+    end
+
+    def channels=(value)
+      @channels.push(value).flatten! if value.is_a?(Array)
     end
 
     def match(pattern, options = {}, &block)
