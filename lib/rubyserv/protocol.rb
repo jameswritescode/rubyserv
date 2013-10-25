@@ -9,6 +9,12 @@ class RubyServ::Protocol
     define_method(name) { |input| raise "##{name} must be defined in the protocol" }
   end
 
+  def handle_client_commands(input)
+    RubyServ::PLUGINS.each do |plugin|
+      plugin.read(input) if plugin.connected?
+    end
+  end
+
   def send_raw(text)
     puts ">> #{text}"
 

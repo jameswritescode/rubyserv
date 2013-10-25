@@ -60,33 +60,30 @@ class RubyServ::IRC
       @protocol.handle_ping(output)
       @protocol.handle_whois(output)
 
-      if self.class.connected? && !@clients_created
-        create_clients
-      end
+      create_clients if self.class.connected? && !@clients_created
+      @protocol.handle_client_commands(output) if @clients_created
     end
   end
 
   def create_clients
     puts '>> Creating RubyServ and other clients'
 
-    RubyServ::IRC::Client.create(@socket,
-      nickname: RubyServ.config.rubyserv.nickname,
-      hostname: RubyServ.config.rubyserv.hostname,
-      username: RubyServ.config.rubyserv.username,
-      realname: RubyServ.config.rubyserv.realname,
-      modes:    'Sio'
-    )
+    RubyServ::PLUGINS.each do |plugin|
+      RubyServ::IRC::Client.create(@socket,
+        nickname: plugin.nickname,
+        hostname: plugin.hostname,
+        username: plugin.username,
+        realname: plugin.realname,
+        modes:    'Sio'
+      )
 
-    RubyServ::IRC::Client.all.each do |client|
-      client.join(RubyServ.config.rubyserv.channel, true)
+      plugin.channels.each do |channel|
+        RubyServ::IRC::Client.find_by_nickname(plugin.nickname).first.join(channel, true)
+      end
+
+      plugin.connected = true
     end
 
     instance_variable_set(:@clients_created, true)
-  end
-
-  def send(text)
-    puts ">> #{text}"
-
-    @socket.puts "#{text}\r"
   end
 end
