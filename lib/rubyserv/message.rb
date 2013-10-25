@@ -11,4 +11,8 @@ class RubyServ::Message
   def reply(msg)
     @client.message(@input.target, msg)
   end
+
+  def client
+    @client
+  end
 end
