@@ -42,14 +42,14 @@ module RubyServ::Plugin
 
     def read(input)
       if input =~ /^:(\S+) PRIVMSG (\S+) :(.*)$/
-        input = OpenStruct.new(target: $2, message: $3)
+        input = OpenStruct.new(user: $1, target: $2, message: $3)
 
         @matchers.each do |matcher|
           if match = input.message.match(matcher.first)
-            client = RubyServ::IRC::Client.find_by_nickname(@nickname).first
-            params = match.captures.unshift(client)
+            message = RubyServ::Message.new(input, service: @nickname)
+            params  = match.captures
 
-            matcher.last.call(params)
+            matcher.last.call(message, *params)
           end
         end
       end
