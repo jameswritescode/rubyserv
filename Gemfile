@@ -3,8 +3,6 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'pry'
 gem 'settingslogic'
-gem 'active_support'
-gem 'i18n'
 
 # This evals a Gemfile_local file that you can put dependencies for your
 # RubyServ plugins.

@@ -6,7 +6,7 @@ require 'socket'
 require 'pry'
 require 'logger'
 require 'settingslogic'
-require 'active_support/all'
+require 'thread'
 
 require_relative 'rubyserv/helpers'
 require_relative 'rubyserv/constants'
