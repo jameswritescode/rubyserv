@@ -1,5 +1,5 @@
 class RubyServ::IRC::User < RubyServ::IRC::Base
-  attr_accessor :nickname, :hostname, :modes, :ts
+  attr_accessor :nickname, :hostname, :modes, :ts, :login, :realhost
   attr_reader   :realname, :uid, :username, :sid
 
   @users = []

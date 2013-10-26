@@ -65,8 +65,8 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :newton_ MODE newton_ :-R
   # :42AAAAAAB NICK newton_ :1380142555
   # :00A ENCAP * CHGHOST 42AAAAAAB :testing
-  # TODO :42AAAAAYS ENCAP * REALHOST 127.0.0.1.host.name
-  # TODO :42AAAAAYS ENCAP * LOGIN howell
+  # :42AAAAAYS ENCAP * REALHOST 127.0.0.1.host.name
+  # :42AAAAAYS ENCAP * LOGIN howell
   def handle_user(input)
     if input =~ /^:(\w{3}) UID (\S+) (\d+) (\d+) (\S+) (\S+) (\S+) (\S+) (\S+) :(.*)$/
       RubyServ::IRC::User.create(
@@ -96,6 +96,10 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
       RubyServ::IRC::User.find_by_nickname(nick).first.modes = modes
     elsif input =~ /^(\S+) ENCAP \* CHGHOST (\S+) :(.*)$/
       RubyServ::IRC::User.find($2).hostname = $3
+    elsif input =~ /^:(\S+) ENCAP \* REALHOST (\S+)$/
+      RubyServ::IRC::User.find($1).realhost = $2
+    elsif input =~ /^:(\S+) ENCAP \* LOGIN (\S+)$/
+      RubyServ::IRC::User.find($1).login = $2
     end
   end
 
