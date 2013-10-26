@@ -11,10 +11,11 @@ module RubyServ::Plugin
     attr_reader   :matchers
     attr_writer   :connected
 
+    EVENTS = ['JOIN', 'PART', 'TMODE', 'KICK', 'PRIVMSG']
+
     def self.extended(klass)
       klass.instance_exec do
-        @matchers  = []
-        @callbacks = []
+        @matchers, @events, @callbacks, @web_routes = [], [], [], []
 
         @connected = false
 
@@ -47,32 +48,67 @@ module RubyServ::Plugin
       @matchers << [pattern, options, block]
     end
 
-    def read(input)
+    def event(event, options = {}, &block)
+      @events << [event, block]
+    end
+
+    def web(type, route, &block)
+      @web_routes << [type, route, block]
+    end
+
+    def __read(input)
       if input =~ /^:(\S+) PRIVMSG (\S+) :(.*)$/
-        input = OpenStruct.new(user: $1, target: $2, message: $3)
+        __read_matchers(OpenStruct.new(user: $1, target: $2, message: $3))
+      end
 
-        get_matchers_for(input.message).each do |pattern, options, block|
-          if match = input.message.match(pattern)
-            message = RubyServ::Message.new(input, service: @nickname)
-            params  = match.captures
+      if input =~ /^:(\S+) (\S+) (\S+) (.*)$/
+        target = $2 == 'PRIVMSG' ? $3 : $4.split.first
 
-            @callbacks.each { |callback| method(callback).call }
+        __read_events(OpenStruct.new(user: $1, event: $2, target: target)) if EVENTS.include?($2)
+      end
+    end
 
-            block.call(message, *params)
-          end
+    def __read_matchers(input)
+      __get_matchers_for(input.message).each do |pattern, options, block|
+        if match = input.message.match(pattern)
+          params = match.captures
+
+          __make_callbacks
+
+          block.call(__parse_message(input), *params)
         end
       end
     end
 
-    def get_matchers_for(message)
-      if prefix_used?(message)
+    def __read_events(input)
+      __get_events_for(input.event).each do |_, block|
+        __make_callbacks
+
+        block.call(__parse_message(input))
+      end
+    end
+
+    def __parse_message(input)
+      RubyServ::Message.new(input, service: @nickname)
+    end
+
+    def __make_callbacks
+      @callbacks.each { |callback| method(callback).call }
+    end
+
+    def __get_matchers_for(message)
+      if __prefix_used?(message)
         @matchers.select { |matcher| matcher[1][:prefix] }
       else
         @matchers.select { |matcher| !matcher[1][:prefix] }
       end
     end
 
-    def prefix_used?(message)
+    def __get_events_for(event)
+      @events.select { |ary| ary.first.to_s == event.downcase }
+    end
+
+    def __prefix_used?(message)
       message.start_with?(RubyServ.config.rubyserv.prefix) || message =~ /^#{@nickname}(\W|_)/
     end
 

@@ -11,7 +11,7 @@ class RubyServ::Protocol
 
   def handle_client_commands(input)
     RubyServ::PLUGINS.each do |plugin|
-      plugin.read(input) if plugin.connected?
+      plugin.__read(input) if plugin.connected?
     end
   end
 
