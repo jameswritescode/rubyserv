@@ -14,6 +14,7 @@ module RubyServ::Plugin
     def self.extended(klass)
       klass.instance_exec do
         @matchers  = []
+        @callbacks = []
 
         @connected = false
 
@@ -22,6 +23,10 @@ module RubyServ::Plugin
         @realname = RubyServ.config.rubyserv.realname
         @channels = [RubyServ.config.rubyserv.channel]
       end
+    end
+
+    def before_match(method)
+      @callbacks << method
     end
 
     def configure(&block)
@@ -46,12 +51,14 @@ module RubyServ::Plugin
       if input =~ /^:(\S+) PRIVMSG (\S+) :(.*)$/
         input = OpenStruct.new(user: $1, target: $2, message: $3)
 
-        get_matchers_for(input.message).each do |matcher|
-          if match = input.message.match(matcher.first)
+        get_matchers_for(input.message).each do |pattern, options, block|
+          if match = input.message.match(pattern)
             message = RubyServ::Message.new(input, service: @nickname)
             params  = match.captures
 
-            matcher.last.call(message, *params)
+            @callbacks.each { |callback| method(callback).call }
+
+            block.call(message, *params)
           end
         end
       end

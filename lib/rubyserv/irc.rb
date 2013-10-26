@@ -23,8 +23,7 @@ class RubyServ::IRC
   def start
     create_socket
     define_protocol
-    Thread.new { connect_to_irc }
-    binding.pry
+    connect_to_irc
   end
 
   def create_socket
