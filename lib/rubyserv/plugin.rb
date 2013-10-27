@@ -43,13 +43,15 @@ module RubyServ::Plugin
     end
 
     def match(pattern, options = {}, &block)
-      options = { prefix: true }.merge(options)
+      options = { prefix: true, skip_callbacks: false }.merge(options)
 
       @matchers << [pattern, options, block, @nickname]
     end
 
     def event(event, options = {}, &block)
-      @events << [event, block, @nickname]
+      options = { skip_callbacks: false }.merge(options)
+
+      @events << [event, options, block, @nickname]
     end
 
     def web(type, route, &block)
@@ -70,12 +72,12 @@ module RubyServ::Plugin
 
     def __read_matchers(input)
       __get_matchers_for(input).each do |pattern, options, block, nickname|
-        __verify_service(nickname)
+        return unless __can_react?(nickname, input.target)
 
         if match = input.message.match(pattern)
           params = match.captures
 
-          __make_callbacks
+          __make_callbacks unless options[:skip_callbacks]
 
           block.call(__parse_message(input), *params)
         end
@@ -83,17 +85,24 @@ module RubyServ::Plugin
     end
 
     def __read_events(input)
-      __get_events_for(input.event).each do |_, block, nickname|
-        __verify_service(nickname)
+      __get_events_for(input.event).each do |_, options, block, nickname|
+        return unless __can_react?(nickname, input.target)
 
-        __make_callbacks
+        __make_callbacks unless options[:skip_callbacks]
 
         block.call(__parse_message(input))
       end
     end
 
-    def __verify_service(nickname)
-      false unless @nickname == nickname
+    def __can_react?(nickname, target)
+      service = RubyServ::IRC::Client.find_by_nickname(nickname).first.user
+
+      if target.start_with?('#')
+        channel = RubyServ::IRC::Channel.find(target)
+        channel.users.include?(service) ? true : false
+      else
+        target == @nickname ? true : false
+      end
     end
 
     def __parse_message(input)

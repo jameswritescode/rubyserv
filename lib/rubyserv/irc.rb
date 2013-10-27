@@ -23,8 +23,8 @@ class RubyServ::IRC
   def start
     create_socket
     define_protocol
+    Thread.new { start_sinatra_app } if RubyServ.config.web.enabled
     Thread.new { connect_to_irc }
-    Thread.new { start_sinatra_app if RubyServ.config.web.enabled }
     binding.pry
   end
 

@@ -17,6 +17,12 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     @uid     = RubyServ.config.link.sid + 'SR' + ('%04d' % base_uid)
 
     send_raw(":#{RubyServ.config.link.sid} UID #{@nickname} 0 0 +#{@modes} #{@username} #{@hostname} 0 #{@uid} :#{@realname}")
+
+    create_user
+  end
+
+  def user
+    RubyServ::IRC::User.find_by_nickname(@nickname).first
   end
 
   def nick=(new_nick)
@@ -32,10 +38,16 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     send_raw(":#{@uid} JOIN #{Time.now.to_i} #{channel} +")
 
     mode(channel, "+o #{@nickname}") if op
+
+    RubyServ::IRC::Channel.find(channel).user_list << "#{'@' if op}#{@uid}"
   end
 
   def part(channel, message = 'Leaving channel')
     send_raw(":#{@uid} PART #{channel} :#{message}")
+
+    RubyServ::IRC::Channel.find(channel).user_list.delete_if do |user|
+      user.include?(@uid)
+    end
   end
 
   def notice(target, message)
@@ -93,5 +105,20 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
       @clients << client
       client
     end
+  end
+
+  private
+
+  def create_user
+    RubyServ::IRC::User.create(
+      nickname: @nickname,
+      sid:      '0', # TODO
+      ts:       '0', # TODO
+      modes:    @modes,
+      username: @username,
+      hostname: @hostname,
+      uid:      @uid,
+      realname: @realname
+    )
   end
 end
