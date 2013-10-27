@@ -45,11 +45,11 @@ module RubyServ::Plugin
     def match(pattern, options = {}, &block)
       options = { prefix: true }.merge(options)
 
-      @matchers << [pattern, options, block]
+      @matchers << [pattern, options, block, @nickname]
     end
 
     def event(event, options = {}, &block)
-      @events << [event, block]
+      @events << [event, block, @nickname]
     end
 
     def web(type, route, &block)
@@ -69,7 +69,9 @@ module RubyServ::Plugin
     end
 
     def __read_matchers(input)
-      __get_matchers_for(input.message).each do |pattern, options, block|
+      __get_matchers_for(input).each do |pattern, options, block, nickname|
+        __verify_service(nickname)
+
         if match = input.message.match(pattern)
           params = match.captures
 
@@ -81,11 +83,17 @@ module RubyServ::Plugin
     end
 
     def __read_events(input)
-      __get_events_for(input.event).each do |_, block|
+      __get_events_for(input.event).each do |_, block, nickname|
+        __verify_service(nickname)
+
         __make_callbacks
 
         block.call(__parse_message(input))
       end
+    end
+
+    def __verify_service(nickname)
+      false unless @nickname == nickname
     end
 
     def __parse_message(input)
@@ -96,8 +104,8 @@ module RubyServ::Plugin
       @callbacks.each { |callback| method(callback).call }
     end
 
-    def __get_matchers_for(message)
-      if __prefix_used?(message)
+    def __get_matchers_for(input)
+      if __prefix_used?(input.message) || __is_pm?(input.target)
         @matchers.select { |matcher| matcher[1][:prefix] }
       else
         @matchers.select { |matcher| !matcher[1][:prefix] }
@@ -106,6 +114,10 @@ module RubyServ::Plugin
 
     def __get_events_for(event)
       @events.select { |ary| ary.first.to_s == event.downcase }
+    end
+
+    def __is_pm?(target)
+      target.include?('#') ? false : true
     end
 
     def __prefix_used?(message)
