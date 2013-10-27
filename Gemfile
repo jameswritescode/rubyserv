@@ -4,6 +4,7 @@ gem 'rake'
 gem 'pry'
 gem 'settingslogic'
 gem 'sinatra'
+gem 'sinatra-contrib'
 
 # This evals a Gemfile_local file that you can put dependencies for your
 # RubyServ plugins.

@@ -7,6 +7,7 @@ require 'pry'
 require 'logger'
 require 'settingslogic'
 require 'thread'
+require 'sinatra'
 
 require_relative 'rubyserv/helpers'
 require_relative 'rubyserv/constants'

@@ -23,7 +23,9 @@ class RubyServ::IRC
   def start
     create_socket
     define_protocol
-    connect_to_irc
+    Thread.new { connect_to_irc }
+    Thread.new { start_sinatra_app if RubyServ.config.web.enabled }
+    binding.pry
   end
 
   def create_socket
@@ -45,6 +47,25 @@ class RubyServ::IRC
     @protocol = Kernel.const_get("RubyServ::Protocol::#{RubyServ.config.link.protocol}").new(@socket)
   end
 
+  def generate_sinatra_routes
+    # This is dirty and I don't like it, but I don't know of a better way at
+    # this time.
+    RubyServ::PLUGINS.each do |plugin|
+      plugin.web_routes.each do |type, route, block|
+        type = type.to_s.upcase
+        Sinatra::Application.routes[type] ||= []
+        Sinatra::Application.routes[type] << [/\A#{::Regexp.new(route).source}\z/, [], [], block]
+      end
+    end
+  end
+
+  def start_sinatra_app
+    generate_sinatra_routes
+
+    Sinatra::Application.set(:port, RubyServ.config.web.port)
+    Sinatra::Application.run!
+  end
+
   def connect_to_irc
     @protocol.authenticate
 
@@ -59,9 +80,9 @@ class RubyServ::IRC
       @protocol.handle_channel(output)
       @protocol.handle_ping(output)
       @protocol.handle_whois(output)
+      @protocol.handle_client_commands(output) if @clients_created
 
       create_clients if self.class.connected? && !@clients_created
-      @protocol.handle_client_commands(output) if @clients_created
     end
   end
 

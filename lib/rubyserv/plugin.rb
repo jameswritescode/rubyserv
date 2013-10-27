@@ -9,6 +9,7 @@ module RubyServ::Plugin
   module ClassMethods
     attr_accessor :realname, :nickname, :hostname, :username
     attr_writer   :connected
+    attr_reader   :web_routes
 
     EVENTS = ['JOIN', 'PART', 'TMODE', 'KICK', 'PRIVMSG']
 

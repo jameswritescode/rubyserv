@@ -16,3 +16,7 @@ rubyserv:
   username: RubyServ
   channel: '#services'
   prefix: '!'
+
+web:
+  enabled: false
+  port: 1234
