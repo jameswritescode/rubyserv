@@ -26,12 +26,18 @@ module RubyServ::Plugin
       end
     end
 
-    def before_match(method)
-      @callbacks << method
+    def before(method, options = {})
+      options = { skip: false }.merge(options)
+
+      @callbacks << [method, options]
     end
 
     def configure(&block)
       yield self
+    end
+
+    def client
+      RubyServ::IRC::Client.find_by_nickname(@nickname)
     end
 
     def channels
@@ -75,11 +81,12 @@ module RubyServ::Plugin
         return unless __can_react?(nickname, input.target)
 
         if match = input.message.match(pattern)
-          params = match.captures
+          params  = match.captures
+          message = __parse_message(input)
 
-          __make_callbacks unless options[:skip_callbacks]
+          __make_callbacks(:matchers, message) unless options[:skip_callbacks]
 
-          block.call(__parse_message(input), *params)
+          block.call(message, *params)
         end
       end
     end
@@ -88,9 +95,11 @@ module RubyServ::Plugin
       __get_events_for(input.event).each do |_, options, block, nickname|
         return unless __can_react?(nickname, input.target)
 
-        __make_callbacks unless options[:skip_callbacks]
+        message = __parse_message(input)
 
-        block.call(__parse_message(input))
+        __make_callbacks(:events, message) unless options[:skip_callbacks]
+
+        block.call(message)
       end
     end
 
@@ -109,8 +118,19 @@ module RubyServ::Plugin
       RubyServ::Message.new(input, service: @nickname)
     end
 
-    def __make_callbacks
-      @callbacks.each { |callback| method(callback).call }
+    def __make_callbacks(type, message)
+      @callbacks.each do |callback, options|
+        skip     = options[:skip] ? options[:skip] : []
+        callback = method(callback)
+
+        unless skip.include?(type)
+          if !callback.arity.zero?
+            callback.call(message)
+          else
+            callback.call
+          end
+        end
+      end
     end
 
     def __get_matchers_for(input)
