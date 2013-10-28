@@ -7,3 +7,6 @@ Gemfile.lock
 
 plugins
 !plugins/rubyserv.rb
+
+data/*
+!data/.keep
