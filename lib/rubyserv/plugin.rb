@@ -37,7 +37,7 @@ module RubyServ::Plugin
     end
 
     def client
-      RubyServ::IRC::Client.find_by_nickname(@nickname)
+      RubyServ::IRC::Client.find_by_nickname(@nickname).first
     end
 
     def channels
@@ -104,13 +104,13 @@ module RubyServ::Plugin
     end
 
     def __can_react?(nickname, target)
-      service = RubyServ::IRC::Client.find_by_nickname(nickname).first.user
+      service = RubyServ::IRC::Client.find_by_nickname(nickname).first
 
       if target.start_with?('#')
         channel = RubyServ::IRC::Channel.find(target)
-        channel.users.include?(service) ? true : false
+        channel.users.include?(service.user) ? true : false
       else
-        target == @nickname ? true : false
+        target == service.uid ? true : false
       end
     end
 
