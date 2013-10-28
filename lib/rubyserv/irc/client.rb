@@ -10,13 +10,13 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     @username = options[:username]
     @realname = options[:realname]
     @modes    = options[:modes]
-    @socket   = socket
+    @protocol = RubyServ::Protocol.new(socket)
 
     base_uid = self.class.instance_variable_get(:@base_uid)
     base_uid = self.class.instance_variable_set(:@base_uid, base_uid + 1)
     @uid     = RubyServ.config.link.sid + 'SR' + ('%04d' % base_uid)
 
-    send_raw(":#{RubyServ.config.link.sid} UID #{@nickname} 0 0 +#{@modes} #{@username} #{@hostname} 0 #{@uid} :#{@realname}")
+    @protocol.send_raw(":#{RubyServ.config.link.sid} UID #{@nickname} 0 0 +#{@modes} #{@username} #{@hostname} 0 #{@uid} :#{@realname}")
 
     create_user
   end
@@ -28,14 +28,14 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   def nick=(new_nick)
     if RubyServ::IRC::User.find_by_nickname(new_nick).empty?
       @nickname = new_nick
-      send_raw(":#{@uid} NICK #{@nickname} #{Time.now.to_i}")
+      @protocol.send_raw(":#{@uid} NICK #{@nickname} #{Time.now.to_i}")
     else
       puts ">> Nickname #{new_nick} is already taken"
     end
   end
 
   def join(channel, op = false)
-    send_raw(":#{@uid} JOIN #{Time.now.to_i} #{channel} +")
+    @protocol.send_raw(":#{@uid} JOIN #{Time.now.to_i} #{channel} +")
 
     mode(channel, "+o #{@nickname}") if op
 
@@ -43,7 +43,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   def part(channel, message = 'Leaving channel')
-    send_raw(":#{@uid} PART #{channel} :#{message}")
+    @protocol.send_raw(":#{@uid} PART #{channel} :#{message}")
 
     RubyServ::IRC::Channel.find(channel).user_list.delete_if do |user|
       user.include?(@uid)
@@ -51,15 +51,15 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   def notice(target, message)
-    send_raw(":#{@uid} NOTICE #{target} :#{message}")
+    @protocol.send_raw(":#{@uid} NOTICE #{target} :#{message}")
   end
 
   def message(target, message)
-    send_raw(":#{@uid} PRIVMSG #{target} :#{message}")
+    @protocol.send_raw(":#{@uid} PRIVMSG #{target} :#{message}")
   end
 
   def action(target, message)
-    send_raw(":#{@uid} PRIVMSG #{target} :\x01ACTION #{message}\x01")
+    @protocol.send_raw(":#{@uid} PRIVMSG #{target} :\x01ACTION #{message}\x01")
   end
 
   def quit(message = 'RubyServ shutdown')
@@ -78,7 +78,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   def mode(channel, modes)
-    send_raw(":#{@uid} TMODE #{RubyServ::IRC::Channel.find(channel).ts} #{channel} #{modes}")
+    @protocol.send_raw(":#{@uid} TMODE #{RubyServ::IRC::Channel.find(channel).ts} #{channel} #{modes}")
   end
 
   def whois(from)
@@ -88,15 +88,8 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     send_numeric(from, 318, "#{@nickname.downcase} :End of WHOIS")
   end
 
-  def send_raw(text)
-    puts ">> #{text}"
-
-    sleep(0.05)
-    @socket.puts "#{text}\r"
-  end
-
   def send_numeric(target, numeric, text)
-    send_raw(":#{RubyServ.config.link.sid} #{numeric} #{target} #{text}")
+    @protocol.send_raw(":#{RubyServ.config.link.sid} #{numeric} #{target} #{text}")
   end
 
   class << self
