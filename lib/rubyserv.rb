@@ -29,7 +29,7 @@ Dir.glob(RubyServ.root + 'plugins/*.rb').each do |plugin|
 end
 
 module RubyServ
-  def self.start!
-    RubyServ::IRC.new(RubyServ.config.link)
+  def self.start!(args)
+    RubyServ::IRC.new(RubyServ.config.link, args)
   end
 end

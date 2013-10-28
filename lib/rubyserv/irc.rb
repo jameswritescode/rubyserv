@@ -3,9 +3,10 @@ class RubyServ::IRC
 
   @connected = false
 
-  def initialize(link_config)
-    @server = link_config.hostname
-    @port   = link_config.port
+  def initialize(link_config, args)
+    @server   = link_config.hostname
+    @port     = link_config.port
+    @cli_args = args
 
     start
   rescue NameError => ex
@@ -23,9 +24,15 @@ class RubyServ::IRC
   def start
     create_socket
     define_protocol
+
     Thread.new { start_sinatra_app } if RubyServ.config.web.enabled
-    Thread.new { connect_to_irc }
-    binding.pry
+
+    if @cli_args.include?('-debug')
+      connect_to_irc
+    else
+      Thread.new { connect_to_irc }
+      binding.pry
+    end
   end
 
   def create_socket
