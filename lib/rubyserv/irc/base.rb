@@ -27,4 +27,8 @@ class RubyServ::IRC::Base
       self.instance_variable_get("@#{self.to_s.sub('RubyServ::IRC::', '').downcase}s")
     end
   end
+
+  def destroy
+    self.class.send(:collection_variable).delete_if { |object| object == self }
+  end
 end

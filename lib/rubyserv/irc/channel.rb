@@ -26,11 +26,6 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
     clean.map { |user| RubyServ::IRC::User.find(user) }
   end
 
-  def destroy
-    channels = self.class.instance_variable_get(:@channels)
-    channels.delete_if { |channel| channel == self }
-  end
-
   STATUSES.each do |status|
     define_method("#{status[:name]}s") do
       users.select { |user| user.start_with?(status[:symbol]) }
