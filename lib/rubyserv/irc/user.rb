@@ -21,7 +21,7 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
   end
 
   def channels
-    RubyServ::IRC::Channel.all.select { |channel| channel.users.include?(@uid) }
+    RubyServ::IRC::Channel.all.select { |channel| channel.users.include?(self) }
   end
 
   def oper?

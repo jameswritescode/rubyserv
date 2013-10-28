@@ -3,7 +3,7 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
   attr_reader   :sid, :name
 
   @channels = []
-  STATUSES = [RubyServ::OWNER, RubyServ::ADMIN, RubyServ::OP, RubyServ::HALFOP, RubyServ::VOICE]
+  STATUSES  = [RubyServ::OWNER, RubyServ::ADMIN, RubyServ::OP, RubyServ::HALFOP, RubyServ::VOICE]
 
   def initialize(options = {})
     # TODO: Update modes, user_list, and ts when changes are made to
@@ -28,7 +28,9 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
 
   STATUSES.each do |status|
     define_method("#{status[:name]}s") do
-      users.select { |user| user.start_with?(status[:symbol]) }
+      user_list.select { |user| user.start_with?(status[:symbol]) }.map do |user|
+        RubyServ::IRC::User.find(user.sub(status[:symbol], ''))
+      end
     end
   end
 

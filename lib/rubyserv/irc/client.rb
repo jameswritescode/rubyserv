@@ -98,6 +98,10 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
       @clients << client
       client
     end
+
+    def find(id)
+      @clients.find { |client| client.uid == id }
+    end
   end
 
   private
