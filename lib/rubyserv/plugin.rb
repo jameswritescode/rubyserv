@@ -23,6 +23,7 @@ module RubyServ::Plugin
         @username = RubyServ.config.rubyserv.username
         @realname = RubyServ.config.rubyserv.realname
         @channels = [RubyServ.config.rubyserv.channel]
+        @prefix   = RubyServ.config.rubyserv.prefix
       end
     end
 
@@ -49,7 +50,7 @@ module RubyServ::Plugin
     end
 
     def match(pattern, options = {}, &block)
-      options = { prefix: true, skip_callbacks: false }.merge(options)
+      options = { skip_prefix: false, skip_callbacks: false }.merge(options)
 
       @matchers << [pattern, options, block, @nickname]
     end
@@ -135,9 +136,9 @@ module RubyServ::Plugin
 
     def __get_matchers_for(input)
       if __prefix_used?(input.message) || __is_pm?(input.target)
-        @matchers.select { |matcher| matcher[1][:prefix] }
+        @matchers.select { |matcher| !matcher[1][:skip_prefix] }
       else
-        @matchers.select { |matcher| !matcher[1][:prefix] }
+        @matchers.select { |matcher| matcher[1][:skip_prefix] }
       end
     end
 
@@ -150,7 +151,7 @@ module RubyServ::Plugin
     end
 
     def __prefix_used?(message)
-      message.start_with?(RubyServ.config.rubyserv.prefix) || message =~ /^#{@nickname}(\W|_)/
+      message.start_with?(@prefix) || message =~ /^#{@nickname}(\W|_)/
     end
 
     def connected?
