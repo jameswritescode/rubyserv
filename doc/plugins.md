@@ -114,6 +114,8 @@ module SomeServ
 end
 ```
 
+`web` can take one parameter similar to `event` and `match` that returns a `RubyServ::Message` object, but is currently only useful for `m.client`.
+
 Be unique with your routes per service, or you'll be looking at clashes.
 
 ## `before(method, options = {})`
