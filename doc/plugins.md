@@ -17,13 +17,14 @@ The only thing **required** in a plugin are `include RubyServ::Plugin` and `conf
 * `username (String) (Optional)`
 * `realname (String) (Optional)`
 * `channels (Array)  (Optional)`
+* `prefix   (String) (Optional)`
 
 **Example:**
 
 ```ruby
 module SomeServ
   include RubyServ::Plugin
-  
+
   configure do |config|
     config.nickname = 'SomeServ'
     config.hostname = 'someserv.does.something'
@@ -42,14 +43,15 @@ end
 
 **Supported `options`:**
 
-* `prefix (default: true)`
+* `skip_prefix    (default: false)`
+* `skip_callbacks (default: false)`
 
 **Example:**
 
 ```ruby
 module SomeServ
   include RubyServ::Plugin
-  
+
   # ...
   match(/some (\S+)/) do |m, param|
     m.reply "some #{param} called by #{m.user.nickname}"
@@ -72,12 +74,14 @@ When greating groups when in the pattern (in this case, `(\S+)`) match will take
 
 **Supported `options`:**
 
+* `skip_callbacks (default: false)`
+
 **Example:**
 
 ```ruby
 module SomeServ
   include RubyServ::Plugin
-  
+
   # ...
   event :privmsg do |m|
     m.reply "#{m.user.nickname} someone said something!"
@@ -101,7 +105,7 @@ end
 ```ruby
 module SomeServ
   include RubyServ::Plugin
-  
+
   # ...
   web :post, '/testing' do
     RubyServ::IRC::Client.find_by_nickname(@nickname).first.message('#channel', 'there was a POST to /testing!')
@@ -111,3 +115,42 @@ end
 ```
 
 Be unique with your routes per service, or you'll be looking at clashes.
+
+## `before(method, options = {})`
+
+`before` acts like `before_action` in rails. The the method specified after before is executed before events and matches.
+
+**Parameters:**
+
+* `method  (Symbol) (Required)`
+* `options (Hash)   (Optional)`
+
+**Supported `options`:**
+
+* `skip (Array or String) (Optional)`
+
+`skip` can take these values: `matchers`, `events`
+
+It can be an array or string, however specifying both types will pretty much make the `before` useless anyway.
+
+**Example:**
+
+```ruby
+module SomeServ
+  include RubyServ::Plugin
+
+  before :init
+  before :init, skip: :events
+  before :init, skip: [:events, :matchers]
+
+  match(/.../) do |m|
+    # ...
+  end
+
+  def init
+    # ...
+  end
+end
+```
+
+Be warned that right now any instance variables defined in `before` will then exist for all other matchers and events, regardless if the before is set to ignore one or the other.
