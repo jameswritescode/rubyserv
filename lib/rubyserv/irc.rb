@@ -69,14 +69,20 @@ class RubyServ::IRC
     RubyServ::Plugin.protocol = @protocol
   end
 
+  def create_sinatra_route_proc(block, service)
+    proc do
+      block.arity > 0 ? block.call(RubyServ::Message.new(nil, service: service)) : block.call
+    end
+  end
+
   def generate_sinatra_routes
     # This is dirty and I don't like it, but I don't know of a better way at
     # this time.
     RubyServ::PLUGINS.each do |plugin|
-      plugin.web_routes.each do |type, route, block|
+      plugin.web_routes.each do |type, route, block, nickname|
         type = type.to_s.upcase
         Sinatra::Application.routes[type] ||= []
-        Sinatra::Application.routes[type] << [/\A#{::Regexp.new(route).source}\z/, [], [], block]
+        Sinatra::Application.routes[type] << [/\A#{::Regexp.new(route).source}\z/, [], [], create_sinatra_route_proc(block, nickname)]
       end
     end
   end

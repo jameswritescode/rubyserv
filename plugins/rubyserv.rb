@@ -18,8 +18,11 @@ module Core
 
   match(/quit/) do |m|
     if is_oper?(m)
+      m.client.notice(m.user.nickname, 'Shutting down...')
+
       RubyServ::PLUGINS.each { |plugin| plugin.client.quit }
       RubyServ::Plugin.protocol.send_raw("SQUIT :#{RubyServ.config.link.hostname}")
+
       system("kill -9 #{Process.pid}")
     end
   end

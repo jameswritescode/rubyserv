@@ -5,11 +5,11 @@ class RubyServ::Message
   end
 
   def user
-    RubyServ::IRC::User.find(@input.user)
+    @input.nil? ? nil : RubyServ::IRC::User.find(@input.user)
   end
 
   def reply(msg)
-    @client.message(@input.target, msg)
+    @input.nil? ? nil: @client.message(@input.target, msg)
   end
 
   def client

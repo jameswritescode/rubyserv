@@ -134,7 +134,7 @@ module RubyServ::Plugin
     end
 
     def web(type, route, &block)
-      @web_routes << [type, route, block]
+      @web_routes << [type, route, block, @nickname]
     end
 
     def __read(input)
