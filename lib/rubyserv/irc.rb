@@ -19,6 +19,19 @@ class RubyServ::IRC
     def connected?
       @connected
     end
+
+    def create_client(plugin, socket)
+      RubyServ::IRC::Client.create(socket,
+        nickname: plugin.nickname,
+        hostname: plugin.hostname,
+        username: plugin.username,
+        realname: plugin.realname,
+        modes:    'Sio'
+      )
+
+      plugin.channels.each { |channel| plugin.client.join(channel, true) }
+      plugin.connected = true
+    end
   end
 
   def start
@@ -52,6 +65,8 @@ class RubyServ::IRC
 
   def define_protocol
     @protocol = Kernel.const_get("RubyServ::Protocol::#{RubyServ.config.link.protocol}").new(@socket)
+
+    RubyServ::Plugin.protocol = @protocol
   end
 
   def generate_sinatra_routes
@@ -97,25 +112,9 @@ class RubyServ::IRC
     puts '>> Creating RubyServ and other clients'
 
     RubyServ::PLUGINS.each do |plugin|
-      create_client(plugin)
+      self.class.create_client(plugin, @socket)
     end
 
     instance_variable_set(:@clients_created, true)
-  end
-
-  def create_client(plugin)
-    RubyServ::IRC::Client.create(@socket,
-      nickname: plugin.nickname,
-      hostname: plugin.hostname,
-      username: plugin.username,
-      realname: plugin.realname,
-      modes:    'Sio'
-    )
-
-    plugin.channels.each do |channel|
-      RubyServ::IRC::Client.find_by_nickname(plugin.nickname).first.join(channel, true)
-    end
-
-    plugin.connected = true
   end
 end

@@ -6,10 +6,82 @@ module RubyServ::Plugin
     klass.send(:extend, klass)
   end
 
+  class << self
+    attr_accessor :protocol
+
+    def load(plugin, user)
+      return if plugin_already_loaded?(plugin, user)
+
+      self.class.send(:load, RubyServ.root + "plugins/#{plugin.downcase}.rb")
+
+      plugin = Kernel.const_get(plugin)
+
+      RubyServ::IRC.create_client(plugin, protocol.socket)
+
+      rubyserv.notice(user, "Plugin #{plugin} loaded.")
+    rescue NameError
+      rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot load.")
+    rescue => ex
+      rubyserv.notice(user, "There was a problem loading #{plugin}. Error: #{ex.message}")
+    end
+
+    def unload(plugin, user)
+      return if disallow_core_unload(plugin, user)
+
+      plugin = RubyServ::PLUGINS.find { |klass| Kernel.const_get(plugin) == klass }
+      plugin.client.quit("unloaded by #{user}")
+
+      unregister(plugin)
+
+      RubyServ::PLUGINS.delete(plugin)
+
+      rubyserv.notice(user, "Plugin #{plugin} unloaded.")
+    rescue NameError
+      rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot unload.")
+    rescue => ex
+      rubyserv.notice(user, "There was a problem unloading #{plugin}. Error: #{ex.message}")
+    end
+
+    def reload(plugin, user)
+      unload(plugin, user)
+      load(plugin, user)
+    end
+
+    private
+
+    def unregister(plugin)
+      plugin.matchers.clear
+      plugin.events.clear
+      plugin.callbacks.clear
+    end
+
+    def rubyserv
+      RubyServ::IRC::Client.find_by_nickname(Core.nickname).first
+    end
+
+    def plugin_already_loaded?(plugin, user)
+      if RubyServ::PLUGINS.include?(Kernel.const_get(plugin))
+        rubyserv.notice(user, "The plugin #{plugin} is already loaded.")
+        true
+      else
+        false
+      end
+    end
+
+    def disallow_core_unload(plugin, user)
+      if plugin == 'Core'
+        rubyserv.notice(user, 'You cannot unload the Core plugin.')
+        true
+      else
+        false
+      end
+    end
+  end
+
   module ClassMethods
-    attr_accessor :realname, :nickname, :hostname, :username
+    attr_accessor :realname, :nickname, :hostname, :username, :prefix
     attr_writer   :connected
-    attr_reader   :web_routes
+    attr_reader   :web_routes, :matchers, :events, :callbacks
 
     EVENTS = ['JOIN', 'PART', 'TMODE', 'KICK', 'PRIVMSG']
 
@@ -30,7 +102,7 @@ module RubyServ::Plugin
     def before(method, options = {})
       options = { skip: false }.merge(options)
 
-      @callbacks << [method, options]
+      @callbacks << [method, options, @nickname]
     end
 
     def configure(&block)
@@ -120,11 +192,11 @@ module RubyServ::Plugin
     end
 
     def __make_callbacks(type, message)
-      @callbacks.each do |callback, options|
+      @callbacks.each do |callback, options, nickname|
         skip     = options[:skip] ? options[:skip] : []
         callback = method(callback)
 
-        unless skip.include?(type)
+        unless skip.include?(type) || @nickname != nickname
           if !callback.arity.zero?
             callback.call(message)
           else

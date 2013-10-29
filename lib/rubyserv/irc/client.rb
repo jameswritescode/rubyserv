@@ -63,6 +63,14 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   def quit(message = 'RubyServ shutdown')
+    @protocol.send_raw(":#{@uid} QUIT :#{message}")
+
+    RubyServ::IRC::User.find_by_nickname(@nickname).first.channels.each do |channel|
+      channel.user_list.delete_if { |user| user.include?(@nickname) }
+    end
+
+    RubyServ::IRC::User.find(@uid).destroy
+    RubyServ::IRC::Client.find(@uid).destroy
   end
 
   def remove(channel, target, message = 'Removed')
