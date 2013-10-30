@@ -107,14 +107,16 @@ module SomeServ
   include RubyServ::Plugin
 
   # ...
-  web :post, '/testing' do
-    RubyServ::IRC::Client.find_by_nickname(@nickname).first.message('#channel', 'there was a POST to /testing!')
+  web :post, '/testing/:name' do |m, name|
+    m.client.message('#channel', "name: #{name}")
   end
   # ...
 end
 ```
 
 `web` can take one parameter similar to `event` and `match` that returns a `RubyServ::Message` object, but is currently only useful for `m.client`.
+
+Additional parameters work like Sinatra's typical `get '/:param' do |param|` as shown in the example.
 
 Be unique with your routes per service, or you'll be looking at clashes.
 
