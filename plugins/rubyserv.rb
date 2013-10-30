@@ -39,6 +39,14 @@ module Core
     RubyServ::Plugin.reload(plugin, m.user.nickname) if is_oper?(m)
   end
 
+  match(/join (\S+) (\S+)/) do |m, plugin, channel|
+    m.Client.find_by_nickname(plugin).first.join(channel) if is_oper?(m)
+  end
+
+  match(/part (\S+) (\S+)/) do |m, plugin, channel|
+    m.Client.find_by_nickname(plugin).first.part(channel) if is_oper?(m)
+  end
+
   def is_oper?(m)
     m.user.oper? ? true : false
   end
