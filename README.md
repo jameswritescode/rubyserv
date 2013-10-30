@@ -14,8 +14,14 @@ Very simple configuration! Copy `etc/rubyserv.yml.example` to `etc/rubyserv.yml`
 
 ### Plugins (sevices)
 
-See [Plugins](https://github.com/jameswritescode/rubyserv/tree/master/doc/plugins.md)
+See our [plugins](https://github.com/jameswritescode/rubyserv/tree/master/doc/plugins.md) document and our [RubyServ plugins](https://github.com/jameswritescode/rubyserv-plugins) repository.
 
-### Acknowledgements
+## Contributing
+
+If you want to contribute a plugin to this project, check out our [RubyServ plugins](https://github.com/jameswritescode/rubyserv-plugins) repository.
+
+If you want to contribute to the core of RubyServ, please feel free to open a pull request!
+
+## Acknowledgements
 
 This was inspired by @somasonic's [RServ](https://github.com/somasonic/RServ) and @dominikh's [cinch](https://github.com/cinchrb/cinch)
