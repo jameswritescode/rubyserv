@@ -1,5 +1,11 @@
 require_relative 'lib/rubyserv'
 
-Rake::Task.define_task(:console) do
+desc 'Run Pry with the RubyServ source loaded'
+task :console do
   Pry.start
+end
+
+desc 'Show code notes'
+task :notes do
+  system('code_notes')
 end

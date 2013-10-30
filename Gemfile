@@ -5,6 +5,7 @@ gem 'pry'
 gem 'settingslogic'
 gem 'sinatra'
 gem 'sinatra-contrib'
+gem 'code_notes'
 
 # This evals a Gemfile_local file that you can put dependencies for your
 # RubyServ plugins.
