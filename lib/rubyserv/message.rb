@@ -15,4 +15,20 @@ class RubyServ::Message
   def client
     @client
   end
+
+  def Channel
+    RubyServ::IRC::Channel
+  end
+
+  def User
+    RubyServ::IRC::User
+  end
+
+  def Server
+    RubyServ::IRC::Server
+  end
+
+  def Client
+    RubyServ::IRC::Client
+  end
 end
