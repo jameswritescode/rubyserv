@@ -39,15 +39,13 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
 
     mode(channel, "+o #{@nickname}") if op
 
-    RubyServ::IRC::Channel.find(channel).user_list << "#{'@' if op}#{@uid}"
+    RubyServ::IRC::Channel.find(channel).join(@uid, op ? '@' : nil)
   end
 
   def part(channel, message = 'Leaving channel')
     @protocol.send_raw(":#{@uid} PART #{channel} :#{message}")
 
-    RubyServ::IRC::Channel.find(channel).user_list.delete_if do |user|
-      user.include?(@uid)
-    end
+    RubyServ::IRC::Channel.find(channel).part(@uid)
   end
 
   def notice(target, message)

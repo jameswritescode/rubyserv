@@ -104,8 +104,11 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   end
 
   # :42A SJOIN 1367622278 #channel +nrt :+42AAAAAYS @00AAAAAAC 42AAAAAAB
-  # TODO :42AAAAAAB PART #test
-  # TODO :42AAAAAAB JOIN 1380336072 #test +
+  # :42AAAAAAB PART #test
+  # :42AAAAAAB JOIN 1380336072 #test +
+  # TODO Handle channel mode changes
+  # TODO destroy channel if it becomes empty
+  # TODO Update TS when needed
   def handle_channel(input)
     if input =~ /^:(\w{3}) SJOIN (\S+) (\S+) (\S+) :(.*)$/
       RubyServ::IRC::Channel.create(
@@ -115,6 +118,10 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         modes: $4,
         users: $5
       )
+    elsif input =~ /:(\S+) PART (\S+)/
+      channel = RubyServ::IRC::Channel.find($2).part($1)
+    elsif input =~ /:(\S+) JOIN (\d+) (\S+) \+/
+      channel = RubyServ::IRC::Channel.find($3).join($1)
     end
   end
 

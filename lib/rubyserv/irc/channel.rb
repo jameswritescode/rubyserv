@@ -6,8 +6,7 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
   STATUSES  = [RubyServ::OWNER, RubyServ::ADMIN, RubyServ::OP, RubyServ::HALFOP, RubyServ::VOICE]
 
   def initialize(options = {})
-    # TODO: Update modes, user_list, and ts when changes are made to
-    # both of them
+    # TODO: Update modes, and ts when changes are made to them
     self.modes     = options[:modes].sub('+', '')
     self.user_list = options[:users].split
     self.ts        = options[:ts]
@@ -32,6 +31,14 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
         RubyServ::IRC::User.find(user.sub(status[:symbol], ''))
       end
     end
+  end
+
+  def join(uid, mode = nil)
+    self.user_list << "#{mode}#{uid}"
+  end
+
+  def part(uid)
+    self.user_list.delete_if { |user| user.include?(uid) }
   end
 
   class << self
