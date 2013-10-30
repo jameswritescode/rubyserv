@@ -12,12 +12,6 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     @modes    = options[:modes]
     @protocol = RubyServ::Protocol.new(socket)
 
-    base_uid = self.class.instance_variable_get(:@base_uid)
-    base_uid = self.class.instance_variable_set(:@base_uid, base_uid + 1)
-    @uid     = RubyServ.config.link.sid + 'SR' + ('%04d' % base_uid)
-
-    @protocol.send_raw(":#{RubyServ.config.link.sid} UID #{@nickname} 0 0 +#{@modes} #{@username} #{@hostname} 0 #{@uid} :#{@realname}")
-
     create_user
   end
 
@@ -72,15 +66,19 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   def remove(channel, target, message = 'Removed')
+    # TODO
   end
 
   def encap(target, command)
+    # TODO
   end
 
   def kill(target, message = 'Killed')
+    # TODO
   end
 
   def kick(channel, target, message = 'Kicked')
+    # TODO
   end
 
   def mode(channel, modes)
@@ -92,10 +90,6 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     send_numeric(from, 312, "#{@nickname} #{RubyServ.config.rubyserv.hostname} :#{RubyServ.config.link.description}")
     send_numeric(from, 313, "#{@nickname} :is a Network Service")
     send_numeric(from, 318, "#{@nickname.downcase} :End of WHOIS")
-  end
-
-  def send_numeric(target, numeric, text)
-    @protocol.send_raw(":#{RubyServ.config.link.sid} #{numeric} #{target} #{text}")
   end
 
   class << self
@@ -112,7 +106,21 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
 
   private
 
+  def send_numeric(target, numeric, text)
+    @protocol.send_raw(":#{RubyServ.config.link.sid} #{numeric} #{target} #{text}")
+  end
+
+  def create_uid
+    base_uid = self.class.instance_variable_get(:@base_uid)
+    base_uid = self.class.instance_variable_set(:@base_uid, base_uid + 1)
+    @uid     = RubyServ.config.link.sid + 'SR' + ('%04d' % base_uid)
+  end
+
   def create_user
+    create_uid
+
+    @protocol.send_raw(":#{RubyServ.config.link.sid} UID #{@nickname} 0 0 +#{@modes} #{@username} #{@hostname} 0 #{@uid} :#{@realname}")
+
     RubyServ::IRC::User.create(
       nickname: @nickname,
       sid:      '0', # TODO

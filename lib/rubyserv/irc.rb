@@ -87,7 +87,7 @@ class RubyServ::IRC
   def connect_to_irc
     @protocol.authenticate
 
-    while true
+    loop do
       output = @socket.gets.strip
 
       puts "#{output}\r\n"

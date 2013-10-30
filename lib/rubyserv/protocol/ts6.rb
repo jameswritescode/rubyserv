@@ -7,7 +7,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
 
   # ERROR :Closing Link: 127.0.0.1 (Invalid servername.)
   def handle_errors(input)
-    if input =~ /^ERROR :(.*): .*$/
+    if input =~ /^ERROR :(.*): (.*)$/
       if $1 == 'Closing Link'
         puts ">> Error encountered: #{$1} #{$2} - quitting"
         exit

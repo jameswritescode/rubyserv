@@ -13,8 +13,7 @@ class RubyServ::IRC::Server < RubyServ::IRC::Base
     users = RubyServ::IRC::User.find_by_sid(@sid).first
     users.each { |user| user.destroy }
 
-    servers = self.class.instance_variable_get(:@servers)
-    servers.delete_if { |server| server == self }
+    super
   end
 
   def users

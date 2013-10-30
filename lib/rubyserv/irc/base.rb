@@ -29,6 +29,6 @@ class RubyServ::IRC::Base
   end
 
   def destroy
-    self.class.send(:collection_variable).delete_if { |object| object == self }
+    self.class.send(:collection_variable).delete(self)
   end
 end

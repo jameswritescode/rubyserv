@@ -6,7 +6,7 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
   STATUSES  = [RubyServ::OWNER, RubyServ::ADMIN, RubyServ::OP, RubyServ::HALFOP, RubyServ::VOICE]
 
   def initialize(options = {})
-    # TODO: Update modes, and ts when changes are made to them
+    # TODO Update modes, and ts when changes are made to them
     self.modes     = options[:modes].sub('+', '')
     self.user_list = options[:users].split
     self.ts        = options[:ts]
@@ -16,13 +16,11 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
   end
 
   def users
-    clean = user_list.map do |user|
-      STATUSES.each { |status| user.sub!(status[:symbol], '') }
+    user_list.map do |user|
+      STATUSES.each { |status| user = user.sub(status[:symbol], '') }
 
-      user
+      RubyServ::IRC::User.find(user)
     end
-
-    clean.map { |user| RubyServ::IRC::User.find(user) }
   end
 
   STATUSES.each do |status|
