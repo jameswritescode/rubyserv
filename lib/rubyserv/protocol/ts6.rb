@@ -82,7 +82,9 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         realname: $10
       )
     elsif input =~ /^:(\S+) QUIT :(.*)$/
-      RubyServ::IRC::User.find($1).destroy
+      user = RubyServ::IRC::User.find($1)
+      user.channels.each { |channel| channel.part($1) }
+      user.destroy
     elsif input =~ /^:(\S+) NICK (\S+) :(.*)$/
       user          = RubyServ::IRC::User.find($1)
       user.nickname = $2
@@ -106,9 +108,8 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :42A SJOIN 1367622278 #channel +nrt :+42AAAAAYS @00AAAAAAC 42AAAAAAB
   # :42AAAAAAB PART #test
   # :42AAAAAAB JOIN 1380336072 #test +
-  # TODO Handle channel mode changes
-  # TODO destroy channel if it becomes empty
-  # TODO Update TS when needed
+  # TODO :42AAAAAAB TMODE 1383172359 #honk -L+m
+  # TODO :42AAAAAAB TMODE 1383172638 #honk -o 42AAAAAAB
   def handle_channel(input)
     if input =~ /^:(\w{3}) SJOIN (\S+) (\S+) (\S+) :(.*)$/
       RubyServ::IRC::Channel.create(
@@ -119,9 +120,11 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         users: $5
       )
     elsif input =~ /:(\S+) PART (\S+)/
-      channel = RubyServ::IRC::Channel.find($2).part($1)
+      channel = RubyServ::IRC::Channel.find($2)
+      channel.part($1)
+      channel.destroy if channel.users.count.zero?
     elsif input =~ /:(\S+) JOIN (\d+) (\S+) \+/
-      channel = RubyServ::IRC::Channel.find($3).join($1)
+      RubyServ::IRC::Channel.find($3).join($1)
     end
   end
 
