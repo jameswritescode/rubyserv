@@ -67,7 +67,7 @@ class RubyServ::IRC
   end
 
   def define_protocol
-    @protocol = Kernel.const_get("RubyServ::Protocol::#{RubyServ.config.link.protocol}").new(@socket, @logger)
+    @protocol = Kernel.const_get('RubyServ').const_get('Protocol').const_get(RubyServ.config.link.protocol).new(@socket, @logger)
 
     RubyServ::Plugin.protocol = @protocol
     RubyServ::Plugin.logger   = @logger
