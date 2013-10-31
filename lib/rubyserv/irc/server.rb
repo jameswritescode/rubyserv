@@ -21,10 +21,6 @@ class RubyServ::IRC::Server < RubyServ::IRC::Base
   end
 
   class << self
-    def create(options = {})
-      @servers << self.new(options)
-    end
-
     def find(id)
       @servers.find { |server| server.sid == id }
     end

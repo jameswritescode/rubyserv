@@ -40,10 +40,6 @@ class RubyServ::IRC::Channel < RubyServ::IRC::Base
   end
 
   class << self
-    def create(options = {})
-      @channels << self.new(options)
-    end
-
     def find(id)
       @channels.find { |channel| channel.name == id }
     end

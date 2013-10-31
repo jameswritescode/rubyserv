@@ -12,6 +12,10 @@ class RubyServ::IRC::Base
       collection_variable.last
     end
 
+    def create(options = {})
+      collection_variable << self.new(options)
+    end
+
     # Gives find_by_* functionality
     def method_missing(method, *args, &block)
       if method.to_s.start_with?('find_by_')

@@ -37,10 +37,6 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
   end
 
   class << self
-    def create(options = {})
-      @users << self.new(options)
-    end
-
     def find(id)
       @users.find { |user| user.uid == id }
     end
