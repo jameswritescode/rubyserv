@@ -1,4 +1,4 @@
-* Better logging system
 * Thread events and handlers?
 * Figure out how to get rid of the sleep before socket.puts
 * More protocols!
+* Refactor to make passing the socket and logger around easier
