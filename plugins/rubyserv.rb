@@ -9,8 +9,8 @@ module Core
     if is_oper?(m)
       m.client.notice(m.user.nickname, 'Loaded plugins:')
 
-      RubyServ::PLUGINS.each do |plugin|
-        m.client.notice(m.user.nickname, "#{id}: #{plugin} - nick: #{plugin.client.nickname}")
+      RubyServ::PLUGINS.each_with_index do |plugin, index|
+        m.client.notice(m.user.nickname, "#{index}: #{plugin} - nick: #{plugin.client.nickname}")
       end
     end
   end
