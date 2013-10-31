@@ -3,7 +3,6 @@ module Core
 
   configure do |config|
     config.nickname = RubyServ.config.rubyserv.nickname
-    config.prefix   = '.'
   end
 
   match(/plugins/) do |m|
