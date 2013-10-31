@@ -1,5 +1,7 @@
 ## RubyServ
 
+[![Code Climate](https://codeclimate.com/github/jameswritescode/rubyserv.png)](https://codeclimate.com/github/jameswritescode/rubyserv)
+
 This is an IRC services implementation in ruby meant to make writing services and plugins easy alongside your usual IRC services.
 
 This is also written to be TS6 compatible, specifically to work with [Charybdis](http://www.atheme.org/project/charybdis). I've tried to code it so it'll be easy to drop in new protocols, but it still may need some refactoring yet to achieve that. If you would like to use a non-TS6 IRCd please consider contributing a protocol class!
