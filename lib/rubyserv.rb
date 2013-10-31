@@ -8,6 +8,7 @@ require 'logger'
 require 'settingslogic'
 require 'thread'
 require 'sinatra'
+require 'colored'
 
 require_relative 'rubyserv/sinatra/base'
 require_relative 'rubyserv/helpers'

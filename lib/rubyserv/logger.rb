@@ -23,7 +23,7 @@ class RubyServ::Logger
   end
 
   def format_exception(message)
-    "!! #{message}"
+    "!! #{message}".red
   end
 
   def format_general(message)
@@ -47,14 +47,14 @@ class RubyServ::Logger
   end
 
   def format_info(message)
-    "INFO: #{message}"
+    "INFO: #{message}".green
   end
 
   def format_incoming(message)
-    ">> #{message}"
+    ">> #{message}".strip.blue
   end
 
   def format_outgoing(message)
-    "<< #{message}"
+    "<< #{message}".cyan
   end
 end
