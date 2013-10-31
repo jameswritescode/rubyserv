@@ -4,13 +4,13 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
 
   attr_reader :uid, :nickname
 
-  def initialize(socket, options = {})
+  def initialize(socket, logger, options = {})
     @nickname = options[:nickname]
     @hostname = options[:hostname]
     @username = options[:username]
     @realname = options[:realname]
     @modes    = options[:modes]
-    @protocol = RubyServ::Protocol.new(socket)
+    @protocol = RubyServ::Protocol.new(socket, logger)
 
     create_user
   end
@@ -93,8 +93,8 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   class << self
-    def create(socket, options = {})
-      client = self.new(socket, options)
+    def create(socket, logger, options = {})
+      client = self.new(socket, logger, options)
       @clients << client
       client
     end

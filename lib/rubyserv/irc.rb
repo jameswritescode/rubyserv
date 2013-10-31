@@ -2,11 +2,13 @@ class RubyServ::IRC
   attr_reader :protocol
 
   @connected = false
+  @logger    = RubyServ::Logger.new($stderr)
 
   def initialize(link_config, args)
     @server   = link_config.hostname
     @port     = link_config.port
     @cli_args = args
+    @logger   = self.class.logger
 
     start
   rescue NameError => ex
@@ -15,13 +17,14 @@ class RubyServ::IRC
 
   class << self
     attr_writer :connected
+    attr_reader :logger
 
     def connected?
       @connected
     end
 
     def create_client(plugin, socket)
-      RubyServ::IRC::Client.create(socket,
+      RubyServ::IRC::Client.create(socket, @logger,
         nickname: plugin.nickname,
         hostname: plugin.hostname,
         username: plugin.username,
@@ -64,9 +67,10 @@ class RubyServ::IRC
   end
 
   def define_protocol
-    @protocol = Kernel.const_get("RubyServ::Protocol::#{RubyServ.config.link.protocol}").new(@socket)
+    @protocol = Kernel.const_get("RubyServ::Protocol::#{RubyServ.config.link.protocol}").new(@socket, @logger)
 
     RubyServ::Plugin.protocol = @protocol
+    RubyServ::Plugin.logger   = @logger
   end
 
   def generate_sinatra_routes
@@ -84,28 +88,38 @@ class RubyServ::IRC
     Sinatra::Application.run!
   end
 
+  def rescue_exception
+    begin
+      yield
+    rescue => e
+      @logger.exception(e)
+    end
+  end
+
   def connect_to_irc
     @protocol.authenticate
 
     loop do
-      output = @socket.gets.strip
+      rescue_exception do
+        output = @socket.gets.strip
 
-      puts "#{output}\r\n"
+        @logger.incoming "#{output}\r\n"
 
-      @protocol.handle_errors(output)
-      @protocol.handle_server(output)
-      @protocol.handle_user(output)
-      @protocol.handle_channel(output)
-      @protocol.handle_ping(output)
-      @protocol.handle_whois(output)
-      @protocol.handle_client_commands(output) if @clients_created
+        @protocol.handle_errors(output)
+        @protocol.handle_server(output)
+        @protocol.handle_user(output)
+        @protocol.handle_channel(output)
+        @protocol.handle_ping(output)
+        @protocol.handle_whois(output)
+        @protocol.handle_client_commands(output) if @clients_created
 
-      create_clients if self.class.connected? && !@clients_created
+        create_clients if self.class.connected? && !@clients_created
+      end
     end
   end
 
   def create_clients
-    puts '>> Creating RubyServ and other clients'
+    @logger.info 'Creating RubyServ and other clients'
 
     RubyServ::PLUGINS.each do |plugin|
       self.class.create_client(plugin, @socket)

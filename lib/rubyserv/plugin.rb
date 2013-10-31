@@ -7,7 +7,7 @@ module RubyServ::Plugin
   end
 
   class << self
-    attr_accessor :protocol
+    attr_accessor :protocol, :logger
 
     def load(plugin, user)
       return if plugin_already_loaded?(plugin, user)
