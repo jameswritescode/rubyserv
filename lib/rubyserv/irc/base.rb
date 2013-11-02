@@ -32,6 +32,12 @@ class RubyServ::IRC::Base
     end
   end
 
+  def update(options = {})
+    options.each do |key, value|
+      method("#{key}=").call(value)
+    end
+  end
+
   def destroy
     self.class.send(:collection_variable).delete(self)
   end

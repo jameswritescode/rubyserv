@@ -87,9 +87,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
       user.channels.each { |channel| channel.part($1) }
       user.destroy
     elsif input =~ /^:(\S+) NICK (\S+) :(.*)$/
-      user          = RubyServ::IRC::User.find($1)
-      user.nickname = $2
-      user.ts       = $3
+      RubyServ::IRC::User.find($1).update(nickname: $2, ts: $3)
     elsif input =~ /^:(\S+) MODE (\S+) :(.*)$/
       nick, mode = $2, $3
       modes = RubyServ::IRC::User.find_by_nickname(nick).first.modes
