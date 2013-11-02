@@ -24,6 +24,8 @@ class RubyServ::IRC
     end
 
     def create_client(plugin, socket)
+      return if nickname_collision?(plugin)
+
       RubyServ::IRC::Client.create(socket, @logger,
         nickname: plugin.nickname,
         hostname: plugin.hostname,
@@ -34,6 +36,18 @@ class RubyServ::IRC
 
       plugin.channels.each { |channel| plugin.client.join(channel, true) }
       plugin.connected = true
+    end
+
+    def nickname_collision?(plugin)
+      if RubyServ::IRC::User.find_by_nickname(plugin.nickname).nil?
+        RubyServ::PLUGINS.delete(plugin)
+
+        false
+      else
+        @logger.warn("Plugin #{plugin} not loaded because a #{plugin.nickname} already exists.")
+
+        true
+      end
     end
   end
 
