@@ -88,12 +88,13 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
     elsif input =~ /^:(\S+) NICK (\S+) :(.*)$/
       RubyServ::IRC::User.find($1).update(nickname: $2, ts: $3)
     elsif input =~ /^:(\S+) MODE (\S+) :(.*)$/
-      nick, mode = $2, $3
-      modes = RubyServ::IRC::User.find_by_nickname(nick).first.modes
+      nick, mode, user = $2, $3, RubyServ::IRC::User.find_by_nickname(nick)
+
+      modes = user.modes
       modes += mode.sub('+', '') if mode.start_with?('+')
       modes = modes.sub(mode.sub('-', ''), '') if mode.start_with?('-')
 
-      RubyServ::IRC::User.find_by_nickname(nick).first.modes = modes
+      user.modes = modes
     elsif input =~ /^(\S+) ENCAP \* CHGHOST (\S+) :(.*)$/
       RubyServ::IRC::User.find($2).hostname = $3
     elsif input =~ /^:(\S+) ENCAP \* REALHOST (\S+)$/
@@ -133,7 +134,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :42AAAAAAB WHOIS 0RSSR0001 :RubyServ
   def handle_whois(input)
     if input =~ /^:(\S+) WHOIS (\S+) :(.*)$/
-      RubyServ::IRC::Client.find_by_uid($2).first.whois($1)
+      RubyServ::IRC::Client.find_by_uid($2).whois($1)
     end
   end
 end

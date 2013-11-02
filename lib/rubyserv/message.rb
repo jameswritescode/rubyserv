@@ -1,7 +1,7 @@
 class RubyServ::Message
   def initialize(input, options = {})
     @input  = input
-    @client = RubyServ::IRC::Client.find_by_nickname(options[:service]).first
+    @client = RubyServ::IRC::Client.find_by_nickname(options[:service])
   end
 
   def user

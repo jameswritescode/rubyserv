@@ -56,7 +56,7 @@ module RubyServ::Plugin
     end
 
     def rubyserv
-      RubyServ::IRC::Client.find_by_nickname(Core.nickname).first
+      RubyServ::IRC::Client.find_by_nickname(Core.nickname)
     end
 
     def plugin_already_loaded?(plugin, user)
@@ -110,7 +110,7 @@ module RubyServ::Plugin
     end
 
     def client
-      RubyServ::IRC::Client.find_by_nickname(@nickname).first
+      RubyServ::IRC::Client.find_by_nickname(@nickname)
     end
 
     def channels
@@ -177,7 +177,7 @@ module RubyServ::Plugin
     end
 
     def __can_react?(nickname, target)
-      service = RubyServ::IRC::Client.find_by_nickname(nickname).first
+      service = RubyServ::IRC::Client.find_by_nickname(nickname)
 
       if target.start_with?('#')
         channel = RubyServ::IRC::Channel.find(target)

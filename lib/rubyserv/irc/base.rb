@@ -19,7 +19,9 @@ class RubyServ::IRC::Base
     # Gives find_by_* functionality
     def method_missing(method, *args, &block)
       if method.to_s.start_with?('find_by_')
-        collection_variable.select { |item| item.send(method.to_s.sub('find_by_', '')) == args[0] }
+        collection = collection_variable.select { |item| item.send(method.to_s.sub('find_by_', '')) == args[0] }
+
+        collection.count > 1 ? collection : collection.first
       else
         super
       end
