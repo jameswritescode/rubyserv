@@ -67,7 +67,8 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # :00A ENCAP * CHGHOST 42AAAAAAB :testing
   # :42AAAAAYS ENCAP * REALHOST 127.0.0.1.host.name
   # :42AAAAAYS ENCAP * LOGIN howell
-  # TODO :42AAAAAAB AWAY :detached from screen
+  # :42AAAAAAB AWAY :detached from screen
+  # :42AAAAAAB AWAY
   def handle_user(input)
     if input =~ /^:(\w{3}) UID (\S+) (\d+) (\d+) (\S+) (\S+) (\S+) (\S+) (\S+) :(.*)$/
       RubyServ::IRC::User.create(
@@ -101,6 +102,10 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
       RubyServ::IRC::User.find($1).realhost = $2
     elsif input =~ /^:(\S+) ENCAP \* LOGIN (\S+)$/
       RubyServ::IRC::User.find($1).login = $2
+    elsif input =~ /^:(\S+) AWAY :(.*)$/
+      RubyServ::IRC::User.find($1).away = $2
+    elsif input =~ /^:(\S+) AWAY$/
+      RubyServ::IRC::User.find($1).away = false
     end
   end
 

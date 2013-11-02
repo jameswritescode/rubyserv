@@ -1,5 +1,5 @@
 class RubyServ::IRC::User < RubyServ::IRC::Base
-  attr_accessor :nickname, :hostname, :modes, :ts, :login, :realhost
+  attr_accessor :nickname, :hostname, :modes, :ts, :login, :realhost, :away
   attr_reader   :realname, :uid, :username, :sid
 
   @users = []
@@ -9,6 +9,7 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
     self.nickname = options[:nickname]
     self.modes    = options[:modes].sub('+', '')
     self.ts       = options[:ts]
+    self.away     = false
 
     @realname = options[:realname]
     @username = options[:username]
@@ -30,6 +31,10 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
 
   def admin?
     modes.include?('a')
+  end
+
+  def away?
+    away ? true : false
   end
 
   def hostmask
