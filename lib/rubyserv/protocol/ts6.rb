@@ -52,7 +52,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         description: $4
       )
     elsif input =~ /^SQUIT (\S+) :(.*)$/
-      RubyServ::IRC::Server.find_by_name($1).each { |server| server.destroy }
+      RubyServ::IRC::Server.find_by_name($1).destroy
     end
   end
 
