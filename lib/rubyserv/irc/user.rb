@@ -41,6 +41,11 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
     "#{nickname}!#{@username}@#{hostname}"
   end
 
+  def quit
+    channels.each { |channel| channel.part(@uid) }
+    self.destroy
+  end
+
   class << self
     def find(id)
       @users.find { |user| user.uid == id }

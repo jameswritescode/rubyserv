@@ -84,9 +84,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         realname: $10
       )
     elsif input =~ /^:(\S+) QUIT :(.*)$/
-      user = RubyServ::IRC::User.find($1)
-      user.channels.each { |channel| channel.part($1) }
-      user.destroy
+      RubyServ::IRC::User.find($1).quit
     elsif input =~ /^:(\S+) NICK (\S+) :(.*)$/
       RubyServ::IRC::User.find($1).update(nickname: $2, ts: $3)
     elsif input =~ /^:(\S+) MODE (\S+) :(.*)$/
