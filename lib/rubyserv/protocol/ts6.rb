@@ -121,11 +121,11 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         modes: $4,
         users: $5
       )
-    elsif input =~ /:(\S+) PART (\S+)/
+    elsif input =~ /^:(\S+) PART (\S+)$/
       channel = RubyServ::IRC::Channel.find($2)
       channel.part($1)
       channel.destroy if channel.users.count.zero?
-    elsif input =~ /:(\S+) JOIN (\d+) (\S+) \+/
+    elsif input =~ /^:(\S+) JOIN (\d+) (\S+) \+$/
       RubyServ::IRC::Channel.find($3).join($1)
     end
   end
