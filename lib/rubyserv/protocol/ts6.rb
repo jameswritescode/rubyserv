@@ -88,12 +88,11 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
     elsif input =~ /^:(\S+) NICK (\S+) :(.*)$/
       RubyServ::IRC::User.find($1).update(nickname: $2, ts: $3)
     elsif input =~ /^:(\S+) MODE (\S+) :(.*)$/
-      nick, mode, user = $2, $3, RubyServ::IRC::User.find_by_nickname(nick)
-
-      modes = user.modes
-      modes += mode.sub('+', '') if mode.start_with?('+')
-      modes = modes.sub(mode.sub('-', ''), '') if mode.start_with?('-')
-
+      nick, mode = $2, $3
+      user       = RubyServ::IRC::User.find_by_nickname(nick)
+      modes      = user.modes
+      modes     += mode.sub('+', '') if mode.start_with?('+')
+      modes      = modes.sub(mode.sub('-', ''), '') if mode.start_with?('-')
       user.modes = modes
     elsif input =~ /^(\S+) ENCAP \* CHGHOST (\S+) :(.*)$/
       RubyServ::IRC::User.find($2).hostname = $3
