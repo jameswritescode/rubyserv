@@ -15,11 +15,7 @@ module RubyServ::Plugin
 
         self.class.send(:load, RubyServ.root + "plugins/#{plugin.downcase}.rb")
 
-        plugin = Kernel.const_get(plugin)
-
         register(plugin)
-
-        RubyServ::IRC.create_client(plugin, protocol.socket)
 
         rubyserv.notice(user, "Plugin #{plugin} loaded.")
       end
@@ -56,9 +52,13 @@ module RubyServ::Plugin
     end
 
     def register(plugin)
+      plugin = Kernel.const_get(plugin)
+
       plugin.web_routes.each do |type, route, block, nickname|
         Sinatra::Application.send(type.to_sym, route, { service: nickname }, &block)
       end
+
+      RubyServ::IRC.create_client(plugin, protocol.socket)
     end
 
     def unregister(plugin)
@@ -68,23 +68,22 @@ module RubyServ::Plugin
 
       clear_sinatra_routes(plugin)
 
+      plugin.web_routes.clear
+
       RubyServ::PLUGINS.delete(plugin)
     end
 
     def clear_sinatra_routes(plugin)
       plugin.web_routes.each do |web_route|
-        route = Sinatra::Base.send(:compile, web_route[1]).first
+        types = [web_route.first.to_s.upcase]
+        types << 'HEAD' if web_route.first == :get
 
-        Sinatra::Application.routes[web_route.first.to_s.upcase].delete_if do |sinatra_route|
-          route == sinatra_route.first
+        types.each do |type|
+          Sinatra::Application.routes[type].delete_if do |sinatra_route|
+            Sinatra::Base.send(:compile, web_route[1]).first == sinatra_route.first
+          end
         end
-
-        Sinatra::Application.routes['HEAD'].delete_if do |sinatra_route|
-          route == sinatra_route.first
-        end if web_route.first == :get
       end
-
-      plugin.web_routes.clear
     end
 
     def rubyserv
