@@ -24,30 +24,24 @@ class RubyServ::IRC
     end
 
     def create_client(plugin, socket)
-      return if nickname_collision?(plugin)
+      if nickname_collision?(plugin)
+        @logger.warn "Plugin #{plugin} not loaded because a #{plugin.nickname} already exists."
+      else
+        RubyServ::IRC::Client.create(socket, @logger,
+          nickname: plugin.nickname,
+          hostname: plugin.hostname,
+          username: plugin.username,
+          realname: plugin.realname,
+          modes:    'Sio'
+        )
 
-      RubyServ::IRC::Client.create(socket, @logger,
-        nickname: plugin.nickname,
-        hostname: plugin.hostname,
-        username: plugin.username,
-        realname: plugin.realname,
-        modes:    'Sio'
-      )
-
-      plugin.channels.each { |channel| plugin.client.join(channel, true) }
-      plugin.connected = true
+        plugin.channels.each { |channel| plugin.client.join(channel, true) }
+        plugin.connected = true
+      end
     end
 
     def nickname_collision?(plugin)
-      if RubyServ::IRC::User.find_by_nickname(plugin.nickname).nil?
-        RubyServ::PLUGINS.delete(plugin)
-
-        false
-      else
-        @logger.warn("Plugin #{plugin} not loaded because a #{plugin.nickname} already exists.")
-
-        true
-      end
+      !RubyServ::IRC::User.find_by_nickname(plugin.nickname).nil?
     end
   end
 
@@ -135,10 +129,14 @@ class RubyServ::IRC
   def create_clients
     @logger.info 'Creating RubyServ and other clients'
 
-    RubyServ::PLUGINS.each do |plugin|
-      self.class.create_client(plugin, @socket)
-    end
+    RubyServ::PLUGINS.each { |plugin| self.class.create_client(plugin, @socket) }
 
-    instance_variable_set(:@clients_created, true)
+    clean_bad_plugins
+
+    @clients_created = true
+  end
+
+  def clean_bad_plugins
+    RubyServ::PLUGINS.each { |plugin| RubyServ::PLUGINS.delete(plugin) unless plugin.connected? }
   end
 end
