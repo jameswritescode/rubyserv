@@ -84,7 +84,7 @@ class RubyServ::IRC
   def generate_sinatra_routes
     RubyServ::PLUGINS.each do |plugin|
       plugin.web_routes.each do |type, route, block, nickname|
-        Sinatra::Application.send(type.to_sym, route, { service: nickname }, &block)
+        Sinatra::Application.send(type.to_sym, route, { plugin: plugin, service: nickname }, &block)
       end
     end
   end
