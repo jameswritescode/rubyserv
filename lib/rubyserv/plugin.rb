@@ -10,12 +10,14 @@ module RubyServ::Plugin
     attr_accessor :protocol, :logger
 
     def load(plugin, user)
-      rescue_exception(plugin, user) do
+      rescue_exception(plugin, user, 'load') do
         return if plugin_already_loaded?(plugin, user)
 
         self.class.send(:load, RubyServ.root + "plugins/#{plugin.downcase}.rb")
 
         plugin = Kernel.const_get(plugin)
+
+        register(plugin)
 
         RubyServ::IRC.create_client(plugin, protocol.socket)
 
@@ -24,15 +26,13 @@ module RubyServ::Plugin
     end
 
     def unload(plugin, user)
-      rescue_exception(plugin, user) do
+      rescue_exception(plugin, user, 'unload') do
         return if disallow_core_unload(plugin, user)
 
         plugin = RubyServ::PLUGINS.find { |klass| Kernel.const_get(plugin) == klass }
         plugin.client.quit("unloaded by #{user}")
 
         unregister(plugin)
-
-        RubyServ::PLUGINS.delete(plugin)
 
         rubyserv.notice(user, "Plugin #{plugin} unloaded.")
       end
@@ -45,13 +45,19 @@ module RubyServ::Plugin
 
     private
 
-    def rescue_exception(plugin, user)
+    def rescue_exception(plugin, user, type)
       begin
         yield
       rescue NameError
-        rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot load.")
+        rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot #{type}.")
       rescue => ex
-        rubyserv.notice(user, "There was a problem (un)loading #{plugin}. Error: #{ex.message}")
+        rubyserv.notice(user, "There was a problem #{type}ing #{plugin}. Error: #{ex.message}")
+      end
+    end
+
+    def register(plugin)
+      plugin.web_routes.each do |type, route, block, nickname|
+        Sinatra::Application.send(type.to_sym, route, { service: nickname }, &block)
       end
     end
 
@@ -59,6 +65,26 @@ module RubyServ::Plugin
       plugin.matchers.clear
       plugin.events.clear
       plugin.callbacks.clear
+
+      clear_sinatra_routes(plugin)
+
+      RubyServ::PLUGINS.delete(plugin)
+    end
+
+    def clear_sinatra_routes(plugin)
+      plugin.web_routes.each do |web_route|
+        route = Sinatra::Base.send(:compile, web_route[1]).first
+
+        Sinatra::Application.routes[web_route.first.to_s.upcase].delete_if do |sinatra_route|
+          route == sinatra_route.first
+        end
+
+        Sinatra::Application.routes['HEAD'].delete_if do |sinatra_route|
+          route == sinatra_route.first
+        end if web_route.first == :get
+      end
+
+      plugin.web_routes.clear
     end
 
     def rubyserv

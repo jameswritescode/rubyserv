@@ -26,7 +26,7 @@ module Core
     end
   end
 
-  match(/^load (\S+)/) do |m, plugin|
+  match(/load (\S+)/) do |m, plugin|
     RubyServ::Plugin.load(plugin, m.user.nickname) if is_oper?(m)
   end
 
