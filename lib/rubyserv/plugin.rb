@@ -10,36 +10,32 @@ module RubyServ::Plugin
     attr_accessor :protocol, :logger
 
     def load(plugin, user)
-      return if plugin_already_loaded?(plugin, user)
+      rescue_exception(plugin, user) do
+        return if plugin_already_loaded?(plugin, user)
 
-      self.class.send(:load, RubyServ.root + "plugins/#{plugin.downcase}.rb")
+        self.class.send(:load, RubyServ.root + "plugins/#{plugin.downcase}.rb")
 
-      plugin = Kernel.const_get(plugin)
+        plugin = Kernel.const_get(plugin)
 
-      RubyServ::IRC.create_client(plugin, protocol.socket)
+        RubyServ::IRC.create_client(plugin, protocol.socket)
 
-      rubyserv.notice(user, "Plugin #{plugin} loaded.")
-    rescue NameError
-      rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot load.")
-    rescue => ex
-      rubyserv.notice(user, "There was a problem loading #{plugin}. Error: #{ex.message}")
+        rubyserv.notice(user, "Plugin #{plugin} loaded.")
+      end
     end
 
     def unload(plugin, user)
-      return if disallow_core_unload(plugin, user)
+      rescue_exception(plugin, user) do
+        return if disallow_core_unload(plugin, user)
 
-      plugin = RubyServ::PLUGINS.find { |klass| Kernel.const_get(plugin) == klass }
-      plugin.client.quit("unloaded by #{user}")
+        plugin = RubyServ::PLUGINS.find { |klass| Kernel.const_get(plugin) == klass }
+        plugin.client.quit("unloaded by #{user}")
 
-      unregister(plugin)
+        unregister(plugin)
 
-      RubyServ::PLUGINS.delete(plugin)
+        RubyServ::PLUGINS.delete(plugin)
 
-      rubyserv.notice(user, "Plugin #{plugin} unloaded.")
-    rescue NameError
-      rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot unload.")
-    rescue => ex
-      rubyserv.notice(user, "There was a problem unloading #{plugin}. Error: #{ex.message}")
+        rubyserv.notice(user, "Plugin #{plugin} unloaded.")
+      end
     end
 
     def reload(plugin, user)
@@ -48,6 +44,16 @@ module RubyServ::Plugin
     end
 
     private
+
+    def rescue_exception(plugin, user)
+      begin
+        yield
+      rescue NameError
+        rubyserv.notice(user, "Plugin #{plugin} does not exist, cannot load.")
+      rescue => ex
+        rubyserv.notice(user, "There was a problem (un)loading #{plugin}. Error: #{ex.message}")
+      end
+    end
 
     def unregister(plugin)
       plugin.matchers.clear
