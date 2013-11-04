@@ -24,6 +24,12 @@ class Sinatra::Base
     end
   end
 
+  def self.destroy_methods_from(plugin)
+    plugin.instance_methods.each do |method|
+      remove_method method.to_sym
+    end
+  end
+
   def self.service(value)
     @service = value
   end

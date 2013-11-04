@@ -70,6 +70,7 @@ module RubyServ::Plugin
 
       plugin.web_routes.clear
 
+      Sinatra::Application.destroy_methods_from(plugin)
       RubyServ::PLUGINS.delete(plugin)
     end
 
