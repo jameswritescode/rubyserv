@@ -1,5 +1,6 @@
 class RubyServ::Protocol::TS6 < RubyServ::Protocol
   def handle_incoming(input)
+    verify_authentication(input)
     handle_errors(input)
     handle_server(input)
     handle_user(input)
