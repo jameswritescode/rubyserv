@@ -114,12 +114,7 @@ class RubyServ::IRC
 
         @logger.incoming "#{output}\r\n"
 
-        @protocol.handle_errors(output)
-        @protocol.handle_server(output)
-        @protocol.handle_user(output)
-        @protocol.handle_channel(output)
-        @protocol.handle_ping(output)
-        @protocol.handle_whois(output)
+        @protocol.handle_incoming(output)
         @protocol.handle_client_commands(output) if @clients_created
 
         create_clients if self.class.connected? && !@clients_created

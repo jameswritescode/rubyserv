@@ -6,9 +6,7 @@ class RubyServ::Protocol
     @logger = logger
   end
 
-  [:authenticate, :handle_ping, :verify_authentication,
-   :handle_server, :handle_user, :handle_channel,
-   :handle_errors, :handle_whois].each do |name|
+  [:handle_incoming, :authenticate].each do |name|
     define_method(name) { |input| raise "##{name} must be defined in the protocol" }
   end
 

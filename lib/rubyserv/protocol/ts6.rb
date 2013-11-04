@@ -1,4 +1,13 @@
 class RubyServ::Protocol::TS6 < RubyServ::Protocol
+  def handle_incoming(input)
+    handle_errors(input)
+    handle_server(input)
+    handle_user(input)
+    handle_channel(input)
+    handle_ping(input)
+    handle_whois(input)
+  end
+
   def authenticate
     send_raw("PASS #{RubyServ.config.link.password_send} TS 6 :#{RubyServ.config.link.sid}")
     send_raw('CAPAB :QS ENCAP SAVE RSFNC SERVICES REMOVE')
