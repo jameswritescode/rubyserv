@@ -2,13 +2,11 @@ class RubyServ::IRC
   attr_reader :protocol
 
   @connected = false
-  @logger    = RubyServ::Logger.new($stderr)
 
   def initialize(link_config, args)
     @server   = link_config.hostname
     @port     = link_config.port
     @cli_args = args
-    @logger   = self.class.logger
 
     start
   rescue NameError => ex
@@ -17,7 +15,6 @@ class RubyServ::IRC
 
   class << self
     attr_writer :connected
-    attr_reader :logger
 
     def connected?
       @connected
@@ -25,9 +22,9 @@ class RubyServ::IRC
 
     def create_client(plugin, socket)
       if nickname_collision?(plugin)
-        @logger.warn "Plugin #{plugin} not loaded because a #{plugin.nickname} already exists."
+        RubyServ::Logger.warn "Plugin #{plugin} not loaded because a #{plugin.nickname} already exists."
       else
-        RubyServ::IRC::Client.create(socket, @logger,
+        RubyServ::IRC::Client.create(socket,
           nickname: plugin.nickname,
           hostname: plugin.hostname,
           username: plugin.username,
@@ -75,10 +72,9 @@ class RubyServ::IRC
   end
 
   def define_protocol
-    @protocol = Kernel.const_get('RubyServ').const_get('Protocol').const_get(RubyServ.config.link.protocol).new(@socket, @logger)
+    @protocol = Kernel.const_get('RubyServ').const_get('Protocol').const_get(RubyServ.config.link.protocol).new(@socket)
 
     RubyServ::Plugin.protocol = @protocol
-    RubyServ::Plugin.logger   = @logger
   end
 
   def generate_sinatra_routes
@@ -93,7 +89,7 @@ class RubyServ::IRC
     generate_sinatra_routes
 
     Sinatra::Application.set(:port, RubyServ.config.web.port)
-    Sinatra::Application.set(:logging, @logger)
+    Sinatra::Application.set(:logging, RubyServ::Logger)
     Sinatra::Application.run!
   end
 
@@ -101,7 +97,7 @@ class RubyServ::IRC
     begin
       yield
     rescue => e
-      @logger.exception(e)
+      RubyServ::Logger.exception(e)
     end
   end
 
@@ -112,7 +108,7 @@ class RubyServ::IRC
       rescue_exception do
         output = @socket.gets.strip
 
-        @logger.incoming "#{output}\r\n"
+        RubyServ::Logger.incoming "#{output}\r\n"
 
         @protocol.handle_incoming(output)
         @protocol.handle_client_commands(output) if @clients_created
@@ -123,7 +119,7 @@ class RubyServ::IRC
   end
 
   def create_clients
-    @logger.info 'Creating RubyServ and other clients'
+    RubyServ::Logger.info 'Creating RubyServ and other clients'
 
     RubyServ::PLUGINS.each { |plugin| self.class.create_client(plugin, @socket) }
 

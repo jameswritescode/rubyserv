@@ -7,7 +7,7 @@ module RubyServ::Plugin
   end
 
   class << self
-    attr_accessor :protocol, :logger
+    attr_accessor :protocol
 
     def load(plugin, user)
       rescue_exception(plugin, user, 'load') do

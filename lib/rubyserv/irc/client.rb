@@ -5,14 +5,13 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   attr_accessor :nickname
   attr_reader :uid, :hostname, :username, :realname, :modes
 
-  def initialize(socket, logger, options = {})
+  def initialize(socket, options = {})
     @nickname = options[:nickname]
     @hostname = options[:hostname]
     @username = options[:username]
     @realname = options[:realname]
     @modes    = options[:modes]
-    @protocol = RubyServ::Protocol.new(socket, logger)
-    @logger   = logger
+    @protocol = RubyServ::Protocol.new(socket)
 
     create_user
   end
@@ -28,7 +27,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
       user.nickname = new_nick
       self.nickname = new_nick
     else
-      @logger.info "Nickname #{new_nick} is already taken"
+      RubyServ::Logger.info "Nickname #{new_nick} is already taken"
     end
   end
 
@@ -97,8 +96,8 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
   end
 
   class << self
-    def create(socket, logger, options = {})
-      client = self.new(socket, logger, options)
+    def create(socket, options = {})
+      client = self.new(socket, options)
       @clients << client
       client
     end
