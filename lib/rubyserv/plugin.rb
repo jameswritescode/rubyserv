@@ -232,11 +232,7 @@ module RubyServ::Plugin
         callback = method(callback)
 
         unless skip.include?(type) || @nickname != nickname
-          if !callback.arity.zero?
-            callback.call(message)
-          else
-            callback.call
-          end
+          !callback.arity.zero? ? callback.call(message) : callback.call
         end
       end
     end
