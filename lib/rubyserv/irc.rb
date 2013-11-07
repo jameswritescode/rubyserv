@@ -21,19 +21,24 @@ class RubyServ::IRC
     end
 
     def create_client(plugin, socket)
-      if nickname_collision?(plugin)
-        RubyServ::Logger.warn "Plugin #{plugin} not loaded because a #{plugin.nickname} already exists."
-      else
-        RubyServ::IRC::Client.create(socket,
-          nickname: plugin.nickname,
-          hostname: plugin.hostname,
-          username: plugin.username,
-          realname: plugin.realname,
-          modes:    'Sio'
-        )
+      return if handle_nickname_collision(plugin)
 
-        plugin.channels.each { |channel| plugin.client.join(channel, true) }
-        plugin.connected = true
+      RubyServ::IRC::Client.create(socket,
+        nickname: plugin.nickname,
+        hostname: plugin.hostname,
+        username: plugin.username,
+        realname: plugin.realname,
+        modes:    'Sio'
+      )
+
+      plugin.channels.each { |channel| plugin.client.join(channel, true) }
+      plugin.connected = true
+    end
+
+    def handle_nickname_collision(plugin)
+      if nickname_collision?(plugin)
+        RubyServ::Logger.warn "Plugin #{plugin} not loaded because a user with nick #{plugin.nickname} already exists."
+        true
       end
     end
 
