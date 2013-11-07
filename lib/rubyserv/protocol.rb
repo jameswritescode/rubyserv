@@ -1,9 +1,8 @@
 class RubyServ::Protocol
   attr_reader :socket
 
-  def initialize(socket, logger)
+  def initialize(socket)
     @socket = socket
-    @logger = logger
   end
 
   [:handle_incoming, :authenticate].each do |name|
@@ -17,7 +16,7 @@ class RubyServ::Protocol
   end
 
   def send_raw(text)
-    @logger.outgoing text
+    RubyServ::Logger.outgoing text
 
     sleep(0.05)
     @socket.puts "#{text}\r"
