@@ -54,10 +54,7 @@ module RubyServ::Plugin
     def register(plugin)
       plugin = Kernel.const_get(plugin)
 
-      plugin.web_routes.each do |type, route, block, nickname|
-        Sinatra::Application.send(type.to_sym, route, { plugin: plugin, service: nickname }, &block)
-      end
-
+      Sinatra::Application.inject_plugin_routes(plugin)
       RubyServ::IRC.create_client(plugin, protocol.socket)
     end
 
