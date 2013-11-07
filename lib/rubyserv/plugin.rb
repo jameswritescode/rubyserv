@@ -120,15 +120,18 @@ module RubyServ::Plugin
     def self.extended(klass)
       klass.instance_exec do
         @matchers, @events, @callbacks, @web_routes = [], [], [], []
-
         @connected = false
 
-        @hostname = RubyServ.config.rubyserv.hostname
-        @username = RubyServ.config.rubyserv.username
-        @realname = RubyServ.config.rubyserv.realname
-        @channels = [RubyServ.config.rubyserv.channel]
-        @prefix   = RubyServ.config.rubyserv.prefix
+        set_configuration_defaults
       end
+    end
+
+    def set_configuration_defaults
+      @hostname = RubyServ.config.rubyserv.hostname
+      @username = RubyServ.config.rubyserv.username
+      @realname = RubyServ.config.rubyserv.realname
+      @channels = [RubyServ.config.rubyserv.channel]
+      @prefix   = RubyServ.config.rubyserv.prefix
     end
 
     def before(method, options = {})
