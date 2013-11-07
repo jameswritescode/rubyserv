@@ -50,7 +50,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   # SERVER irc.domain.tld 1 :Server description
   # :irc.domain.tld SERVER services.int 2 :Atheme IRC Services
   # SQUIT services.int :Remote host closed the connection
-  # TODO :42A SID services.int 2 00A :Atheme IRC Services
+  # :42A SID services.int 2 00A :Atheme IRC Services
   def handle_server(input)
     if input =~ /^(\S+ )?SERVER (\S+) (\d+) :(.*)/
       send_svinfo if $1.nil? && !RubyServ::IRC.connected?
@@ -61,8 +61,20 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
         sid:         $3,
         description: $4
       )
+    elsif input =~ /^:(\S{3}) SID (\S+) (\d) (\S{3}) :(.*)$/
+      RubyServ::IRC::Server.create(
+        _1:          $1,
+        name:        $2,
+        _2:          $3,
+        sid:         $4,
+        description: $5
+      )
     elsif input =~ /^SQUIT (\S+) :(.*)$/
-      RubyServ::IRC::Server.find_by_name($1).destroy
+      if $1 =~ /(\S{3})/
+        RubyServ::IRC::Server.find_by_sid($1)
+      else
+        RubyServ::IRC::Server.find_by_name($1).destroy
+      end
     end
   end
 
