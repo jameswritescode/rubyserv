@@ -1,6 +1,6 @@
 ## RubyServ
 
-[![Code Climate](https://codeclimate.com/github/jameswritescode/rubyserv.png)](https://codeclimate.com/github/jameswritescode/rubyserv)
+[![Code Climate](https://codeclimate.com/github/jameswritescode/rubyserv.png)](https://codeclimate.com/github/jameswritescode/rubyserv) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jameswritescode/rubyserv/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 This is an IRC services implementation in ruby meant to make writing services and plugins easy alongside your usual IRC services.
 
