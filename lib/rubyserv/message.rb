@@ -9,7 +9,13 @@ class RubyServ::Message
   end
 
   def reply(msg)
-    @input.nil? ? nil: @client.message(@input.target, msg)
+    if @input.nil?
+      nil
+    else
+      target = @input.target.include?('#') ? @input.target : @input.user
+
+      @client.message(target, msg)
+    end
   end
 
   def client

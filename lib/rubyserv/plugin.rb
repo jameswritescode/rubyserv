@@ -237,7 +237,6 @@ module RubyServ::Plugin
       @matchers.each do |matcher|
         prefix_matchers << matcher.dup
         prefix_matchers.last[0] = Regexp.new(Regexp.escape(@prefix) + matcher[0].source)
-        puts prefix_matchers.last[0]
       end
 
       prefix_matchers
