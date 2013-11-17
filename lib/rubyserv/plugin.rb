@@ -222,11 +222,25 @@ module RubyServ::Plugin
     end
 
     def __get_matchers_for(input)
-      if __prefix_used?(input.message) || __is_pm?(input.target)
+      if __is_pm?(input.target)
         @matchers.select { |matcher| !matcher[1][:skip_prefix] }
+      elsif __prefix_used?(input.message)
+        __matchers_with_prefix.select { |matcher| !matcher[1][:skip_prefix] }
       else
         @matchers.select { |matcher| matcher[1][:skip_prefix] }
       end
+    end
+
+    def __matchers_with_prefix
+      prefix_matchers = []
+
+      @matchers.each do |matcher|
+        prefix_matchers << matcher.dup
+        prefix_matchers.last[0] = Regexp.new(Regexp.escape(@prefix) + matcher[0].source)
+        puts prefix_matchers.last[0]
+      end
+
+      prefix_matchers
     end
 
     def __get_events_for(event)
