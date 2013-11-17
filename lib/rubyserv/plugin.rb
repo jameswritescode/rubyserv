@@ -63,25 +63,12 @@ module RubyServ::Plugin
       plugin.events.clear
       plugin.callbacks.clear
 
-      clear_sinatra_routes(plugin)
+      Sinatra::Application.clear_plugin_routes(plugin)
 
       plugin.web_routes.clear
 
       Sinatra::Application.destroy_methods_from(plugin)
       RubyServ::PLUGINS.delete(plugin)
-    end
-
-    def clear_sinatra_routes(plugin)
-      plugin.web_routes.each do |web_route|
-        types = [web_route.first.to_s.upcase]
-        types << 'HEAD' if web_route.first == :get
-
-        types.each do |type|
-          Sinatra::Application.routes[type].delete_if do |sinatra_route|
-            Sinatra::Base.send(:compile, web_route[1]).first == sinatra_route.first
-          end
-        end
-      end
     end
 
     def rubyserv

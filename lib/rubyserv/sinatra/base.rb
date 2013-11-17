@@ -43,4 +43,17 @@ class Sinatra::Base
       self.send(type.to_sym, route, { plugin: plugin, service: nickname }, &block)
     end
   end
+
+  def self.clear_plugin_routes(plugin)
+    plugin.web_routes.each do |web_route|
+      types = [web_route.first.to_s.upcase]
+      types << 'HEAD' if web_route.first == :get
+
+      types.each do |type|
+        self.routes[type].delete_if do |sinatra_route|
+          self.send(:compile, web_route[1]).first == sinatra_route.first
+        end
+      end
+    end
+  end
 end
