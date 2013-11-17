@@ -9,7 +9,7 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
     self.nickname = options[:nickname]
     self.modes    = options[:modes].sub('+', '')
     self.ts       = options[:ts]
-    self.away     = false
+    self.away     = nil
 
     @realname = options[:realname]
     @username = options[:username]
@@ -34,7 +34,7 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
   end
 
   def away?
-    away ? true : false
+    away.nil? ? false : true
   end
 
   def hostmask

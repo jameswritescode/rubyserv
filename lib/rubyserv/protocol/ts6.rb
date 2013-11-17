@@ -125,7 +125,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
     elsif input =~ /^:(\S+) AWAY :(.*)$/
       RubyServ::IRC::User.find($1).away = $2
     elsif input =~ /^:(\S+) AWAY$/
-      RubyServ::IRC::User.find($1).away = false
+      RubyServ::IRC::User.find($1).away = nil
     end
   end
 
