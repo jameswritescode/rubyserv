@@ -26,4 +26,4 @@ If you want to contribute to the core of RubyServ, please feel free to open a pu
 
 ## Acknowledgements
 
-This was inspired by @somasonic's [RServ](https://github.com/somasonic/RServ) and @dominikh's [cinch](https://github.com/cinchrb/cinch)
+This was inspired by [RServ](https://github.com/somasonic/RServ) and [cinch](https://github.com/cinchrb/cinch)
