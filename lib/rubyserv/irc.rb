@@ -113,6 +113,7 @@ class RubyServ::IRC
 
         RubyServ::Logger.incoming "#{output}\r\n"
 
+        @protocol.handle_version(output)
         @protocol.handle_incoming(output)
         @protocol.handle_client_commands(output) if @clients_created
 
