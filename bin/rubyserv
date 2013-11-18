@@ -2,4 +2,16 @@
 
 require_relative '../lib/rubyserv.rb'
 
-RubyServ.start!(ARGV)
+if ARGV.include?('-daemon')
+  Process.daemon(true)
+
+  pid = Process.fork do
+    RubyServ.start!(ARGV)
+  end
+
+  loop do
+    Process.waitpid(pid)
+  end
+else
+  RubyServ.start!(ARGV)
+end

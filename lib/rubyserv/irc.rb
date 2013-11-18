@@ -53,7 +53,7 @@ class RubyServ::IRC
 
     Thread.new { start_sinatra_app } if RubyServ.config.web.enabled
 
-    if @cli_args.include?('-debug')
+    if @cli_args.include?('-debug') || @cli_args.include?('-daemon')
       connect_to_irc
     else
       Thread.new { connect_to_irc }
