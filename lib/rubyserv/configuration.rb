@@ -1,6 +1,6 @@
 module RubyServ
   class Configuration < Settingslogic
-    source RubyServ.root.join('etc', 'rubyserv.yml')
+    source RubyServ.root.join('config', 'rubyserv.yml')
   end
 
   def self.config

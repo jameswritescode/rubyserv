@@ -1,4 +1,4 @@
-etc/rubyserv.yml
+config/rubyserv.yml
 log/*.log
 vendor
 .bundle
