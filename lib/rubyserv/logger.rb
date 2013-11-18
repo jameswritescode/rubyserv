@@ -42,7 +42,7 @@ class RubyServ::Logger
         log(message, type)
       end
 
-      next if [:incoming, :outgoing, :info, :warn].include?(type)
+      next if [:fatal, :incoming, :outgoing, :info, :warn].include?(type)
 
       define_method "format_#{type}" do |message|
         message
@@ -63,6 +63,10 @@ class RubyServ::Logger
 
     def format_warn(message)
       "WARN: #{message}".yellow
+    end
+
+    def format_fatal(message)
+      "FATAL: #{message}".red
     end
   end
 end

@@ -19,7 +19,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   def handle_errors(input)
     if input =~ /^ERROR :(.*): (.*)$/
       if $1 == 'Closing Link'
-        puts ">> Error encountered: #{$1} #{$2} - quitting"
+        RubyServ::Logger.fatal("Error encountered: #{$1} #{$2} - quitting")
         exit
       end
     end
@@ -29,7 +29,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
   def verify_authentication(input)
     if input =~ /^PASS (\S+) TS 6 :(\S{3})/
       if $1 != RubyServ.config.link.password_receive
-        puts ">> #{$1} does not match the receive password configured #{RubyServ.config.link.password_receive}"
+        RubyServ::Logger.fatal("#{$1} does not match the receive password configured #{RubyServ.config.link.password_receive}")
         exit
       end
     end
