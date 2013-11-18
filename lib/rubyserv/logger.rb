@@ -11,8 +11,13 @@ class RubyServ::Logger
 
         next if message.nil?
 
+        log_file("#{message}\n")
         @output.puts message
       end
+    end
+
+    def log_file(message)
+      File.open("log/rubyserv-#{Time.now.strftime('%m-%d-%y')}.log", 'a') { |f| f.write(message) }
     end
 
     def exception(e)
