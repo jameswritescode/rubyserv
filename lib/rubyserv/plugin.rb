@@ -222,13 +222,18 @@ module RubyServ::Plugin
     end
 
     def __get_matchers_for(input)
+      matchers = []
+
       if __is_pm?(input.target)
-        @matchers.select { |matcher| !matcher[1][:skip_prefix] }
+        matchers = @matchers.select { |matcher| !matcher[1][:skip_prefix] }
       elsif __prefix_used?(input.message)
-        __matchers_with_prefix.select { |matcher| !matcher[1][:skip_prefix] }
-      else
-        @matchers.select { |matcher| matcher[1][:skip_prefix] }
+        matchers = __matchers_with_prefix.select { |matcher| !matcher[1][:skip_prefix] }
       end
+
+      no_prefix = @matchers.select { |matcher| matcher[1][:skip_prefix] }
+      no_prefix.each { |matcher| matchers << matcher } unless no_prefix.empty?
+
+      matchers
     end
 
     def __matchers_with_prefix
