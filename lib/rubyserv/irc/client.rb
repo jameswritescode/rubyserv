@@ -24,8 +24,10 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     if RubyServ::IRC::User.find_by_nickname(new_nick).nil?
       @protocol.send_raw(":#{@uid} NICK #{new_nick} #{Time.now.to_i}")
 
-      user.nickname = new_nick
-      self.nickname = new_nick
+      plugin          = RubyServ::PLUGINS.select { |plugin| plugin.nickname == self.nickname }.first
+      plugin.nickname = new_nick
+      user.nickname   = new_nick
+      self.nickname   = new_nick
     else
       RubyServ::Logger.info "Nickname #{new_nick} is already taken"
     end

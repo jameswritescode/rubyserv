@@ -121,7 +121,7 @@ module RubyServ::Plugin
     def before(method, options = {})
       options = { skip: false }.merge(options)
 
-      @callbacks << [method, options, @nickname]
+      @callbacks << [method, options, self]
     end
 
     def configure(&block)
@@ -143,17 +143,17 @@ module RubyServ::Plugin
     def match(pattern, options = {}, &block)
       options = { skip_prefix: false, skip_callbacks: false }.merge(options)
 
-      @matchers << [pattern, options, block, @nickname]
+      @matchers << [pattern, options, block, self]
     end
 
     def event(event, options = {}, &block)
       options = { skip_callbacks: false }.merge(options)
 
-      @events << [event, options, block, @nickname]
+      @events << [event, options, block, self]
     end
 
     def web(type, route, &block)
-      @web_routes << [type, route, block, @nickname]
+      @web_routes << [type, route, block, self]
     end
 
     def __read(input)
@@ -169,8 +169,8 @@ module RubyServ::Plugin
     end
 
     def __read_matchers(input)
-      __get_matchers_for(input).each do |pattern, options, block, nickname|
-        return unless __can_react?(nickname, input.target)
+      __get_matchers_for(input).each do |pattern, options, block, plugin|
+        return unless __can_react?(plugin.nickname, input.target)
 
         if match = input.message.match(pattern)
           params  = match.captures
@@ -184,8 +184,8 @@ module RubyServ::Plugin
     end
 
     def __read_events(input)
-      __get_events_for(input.event).each do |_, options, block, nickname|
-        return unless __can_react?(nickname, input.target)
+      __get_events_for(input.event).each do |_, options, block, plugin|
+        return unless __can_react?(plugin.nickname, input.target)
 
         message = __parse_message(input)
 
@@ -211,11 +211,11 @@ module RubyServ::Plugin
     end
 
     def __make_callbacks(type, message)
-      @callbacks.each do |callback, options, nickname|
+      @callbacks.each do |callback, options, plugin|
         skip     = options[:skip] ? options[:skip] : []
         callback = method(callback)
 
-        unless skip.include?(type) || @nickname != nickname
+        unless skip.include?(type) || @nickname != plugin.nickname
           !callback.arity.zero? ? callback.call(message) : callback.call
         end
       end

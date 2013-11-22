@@ -39,8 +39,8 @@ class Sinatra::Base
   end
 
   def self.inject_plugin_routes(plugin)
-    plugin.web_routes.each do |type, route, block, nickname|
-      self.send(type.to_sym, route, { plugin: plugin, service: nickname }, &block)
+    plugin.web_routes.each do |type, route, block, service|
+      self.send(type.to_sym, route, { plugin: plugin, service: service.nickname }, &block)
     end
   end
 
