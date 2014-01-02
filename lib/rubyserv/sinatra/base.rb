@@ -9,7 +9,7 @@ class Sinatra::Base
     generate_methods_from(@plugin)
 
     wrapper                 = block.arity != 0 ?
-      proc { |a,p| p.unshift(RubyServ::Message.new(nil, service: @service)); unbound_method.bind(a).call(*p) } :
+      proc { |a,p| p.unshift(RubyServ::Message.new(nil, service: options[:service])); unbound_method.bind(a).call(*p) } :
       proc { |a,p| unbound_method.bind(a).call }
     wrapper.instance_variable_set(:@route_name, method_name)
 
