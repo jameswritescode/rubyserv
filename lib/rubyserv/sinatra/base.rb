@@ -6,14 +6,18 @@ class Sinatra::Base
     pattern, keys           = compile path
     conditions, @conditions = @conditions, []
 
-    generate_methods_from(@plugin)
+    generate_methods_from(options[:plugin])
 
     wrapper                 = block.arity != 0 ?
-      proc { |a,p| p.unshift(RubyServ::Message.new(nil, service: options[:service])); unbound_method.bind(a).call(*p) } :
+      proc { |a,p| p.unshift(rubyserv_message_object(options)); unbound_method.bind(a).call(*p) } :
       proc { |a,p| unbound_method.bind(a).call }
     wrapper.instance_variable_set(:@route_name, method_name)
 
     [ pattern, keys, conditions, wrapper ]
+  end
+
+  def self.rubyserv_message_object(options = {})
+    RubyServ::Message.new(nil, service: options[:service])
   end
 
   def self.generate_methods_from(plugin)
@@ -30,12 +34,10 @@ class Sinatra::Base
     end
   end
 
-  def self.service(value)
-    @service = value
+  def self.service(*)
   end
 
-  def self.plugin(value)
-    @plugin = value
+  def self.plugin(*)
   end
 
   def self.inject_plugin_routes(plugin)
