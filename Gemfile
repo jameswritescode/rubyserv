@@ -7,6 +7,8 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'code_notes'
 gem 'colored'
+gem 'rspec'
+gem 'eventmachine'
 gem 'json'
 
 # This evals a Gemfile_local file that you can put dependencies for your
