@@ -1,27 +1,38 @@
-module RubyServ::Database
-  extend self
-
-  def use(database)
-    @path = find_or_create_database(database)
-
-    self
-  end
-
-  def read
-    JSON.parse(File.read(@path))
+class RubyServ::Database
+  def initialize(path)
+    @path     = path
+    @database = JSON.parse(File.read(@path), symbolize_names: true)
   end
 
   def destroy
     FileUtils.rm @path
   end
 
-  private
+  def [](key)
+    @database[key.to_sym]
+  end
 
-  def find_or_create_database(database)
-    path = RubyServ.root.join('data', "#{database}.json")
+  def []=(key, value)
+    @database[key.to_sym] = value
+  end
 
-    File.open(path, 'w') { |file| file.write('{}') } unless File.exist?(path)
+  def save
+    File.open(@path, 'w') { |file| file.write(@database.to_json) }
+  end
 
-    path
+  class << self
+    def use(database)
+      self.new(find_or_create_database(database))
+    end
+
+    private
+
+    def find_or_create_database(database)
+      path = RubyServ.root.join('data', "#{database}.json")
+
+      File.open(path, 'w') { |file| file.write('{}') } unless File.exist?(path)
+
+      path
+    end
   end
 end
