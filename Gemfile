@@ -9,6 +9,7 @@ gem 'code_notes'
 gem 'colored'
 gem 'eventmachine'
 gem 'json'
+gem 'webrick'
 
 gem 'rspec'
 gem 'fakefs'

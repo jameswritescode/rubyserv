@@ -4,6 +4,10 @@ class RubyServ::Logger
   @output = $stderr
 
   class << self
+    def <<(messages)
+      log(messages, :web)
+    end
+
     def log(messages, event = :debug)
       Array(messages).each do |message|
         message = format_general(message)
@@ -37,16 +41,20 @@ class RubyServ::Logger
       send("format_#{level}", message)
     end
 
-    [:error, :debug, :fatal, :info, :warn, :incoming, :outgoing].each do |type|
+    [:error, :debug, :fatal, :info, :warn, :incoming, :outgoing, :web].each do |type|
       define_method type do |message|
         log(message, type)
       end
 
-      next if [:fatal, :incoming, :outgoing, :info, :warn].include?(type)
+      next if [:fatal, :incoming, :outgoing, :info, :warn, :web].include?(type)
 
       define_method "format_#{type}" do |message|
         message
       end
+    end
+
+    def format_web(message)
+      "WEB: #{message}".strip.magenta
     end
 
     def format_info(message)
