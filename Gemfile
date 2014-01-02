@@ -7,9 +7,11 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'code_notes'
 gem 'colored'
-gem 'rspec'
 gem 'eventmachine'
 gem 'json'
+
+gem 'rspec'
+gem 'fakefs'
 
 # This evals a Gemfile_local file that you can put dependencies for your
 # RubyServ plugins.
