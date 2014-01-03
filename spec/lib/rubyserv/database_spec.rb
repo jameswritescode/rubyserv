@@ -32,16 +32,28 @@ describe RubyServ::Database do
     end
   end
 
-  it 'sets and gets a value' do
-    db = RubyServ::Database.use('test')
-    db[:name] = 'james'
+  it 'converts string keys to symbols' do
+    db       = RubyServ::Database.use('test')
+    db.users = [{ 'name' => 'james' }, { 'name' => 'robert', 'extra' => { 'colors' => { 'favorite' => 'blue' } } }]
 
-    expect(db[:name]).to eql 'james'
+    expect(db.users.first.include?(:name)).to be_true
+    expect(db.users.last.include?(:extra)).to be_true
+    expect(db.users.last[:extra].include?(:colors)).to be_true
+    expect(db.users.last[:extra][:colors].include?(:favorite)).to be_true
+  end
+
+  it 'sets and gets a value' do
+    db        = RubyServ::Database.use('test')
+    db.name   = 'james'
+    db.people = 'james', 'robert'
+
+    expect(db.name).to eql 'james'
+    expect(db.people).to eql ['james', 'robert']
   end
 
   it 'saves set json' do
-    db = RubyServ::Database.use('test')
-    db[:name] = 'james'
+    db      = RubyServ::Database.use('test')
+    db.name = 'james'
     db.save
 
     expect(File.read('data/test.json')).to eql '{"name":"james"}'
