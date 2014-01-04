@@ -95,7 +95,7 @@ module RubyServ::Plugin
   end
 
   module ClassMethods
-    attr_accessor :realname, :nickname, :hostname, :username, :prefix
+    attr_accessor :realname, :nickname, :hostname, :username, :prefix, :database
     attr_writer   :connected
     attr_reader   :web_routes, :matchers, :events, :callbacks
 
@@ -116,6 +116,14 @@ module RubyServ::Plugin
       @realname = RubyServ.config.rubyserv.realname
       @channels = [RubyServ.config.rubyserv.channel]
       @prefix   = RubyServ.config.rubyserv.prefix
+      @database = nil
+    end
+
+    def database
+      unless @database.nil?
+        @initialized_db = RubyServ::Database.use(@database) unless defined?(@initialized_db)
+        @initialized_db
+      end
     end
 
     def before(method, options = {})
