@@ -18,6 +18,10 @@ class RubyServ::Message
     end
   end
 
+  def message(channel, message)
+    client.message(channel, message)
+  end
+
   def client
     @client
   end
