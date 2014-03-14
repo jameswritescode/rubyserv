@@ -6,7 +6,7 @@ Gemfile_local
 Gemfile.lock
 
 plugins
-!plugins/core.rb
+!plugins/core/*
 
 data/*
 !data/.keep
