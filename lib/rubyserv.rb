@@ -31,7 +31,7 @@ require_relative 'rubyserv/irc/server'
 require_relative 'rubyserv/irc/client'
 require_relative 'rubyserv/protocol/ts6'
 
-Dir.glob(RubyServ.root + 'plugins/*.rb').each do |plugin|
+Dir.glob(RubyServ.root + 'plugins/**/*.rb').each do |plugin|
   load RubyServ.root + plugin
 end
 
