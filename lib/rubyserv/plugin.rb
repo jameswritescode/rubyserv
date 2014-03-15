@@ -9,11 +9,11 @@ module RubyServ::Plugin
   class << self
     attr_accessor :protocol
 
-    def load(plugin, user)
+    def load_plugin(plugin, user)
       rescue_exception(plugin, user, 'load') do
         return if plugin_already_loaded?(plugin, user)
 
-        self.class.send(:load, RubyServ.root + "plugins/#{plugin.downcase}.rb")
+        load(RubyServ.root.join('plugins', plugin.downcase, "#{plugin.downcase}.rb"))
 
         register(plugin)
 
@@ -21,7 +21,7 @@ module RubyServ::Plugin
       end
     end
 
-    def unload(plugin, user)
+    def unload_plugin(plugin, user)
       rescue_exception(plugin, user, 'unload') do
         return if disallow_core_unload(plugin, user)
 
@@ -31,12 +31,14 @@ module RubyServ::Plugin
         unregister(plugin)
 
         rubyserv.notice(user, "Plugin #{plugin} unloaded.")
+
+        Object.send(:remove_const, plugin.name.to_sym)
       end
     end
 
-    def reload(plugin, user)
-      unload(plugin, user)
-      load(plugin, user)
+    def reload_plugin(plugin, user)
+      unload_plugin(plugin, user)
+      load_plugin(plugin, user)
     end
 
     private
@@ -60,9 +62,7 @@ module RubyServ::Plugin
 
     def unregister(plugin)
       Sinatra::Application.clear_plugin_routes(plugin)
-
       RubyServ::Matcher.unregister(plugin)
-
       Sinatra::Application.destroy_methods_from(plugin)
       RubyServ::PLUGINS.delete(plugin)
     end

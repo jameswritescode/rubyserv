@@ -27,15 +27,15 @@ module Core
   end
 
   match(/load (\S+)/) do |m, plugin|
-    RubyServ::Plugin.load(plugin, m.user.nickname) if is_oper?(m)
+    RubyServ::Plugin.load_plugin(plugin, m.user.nickname) if is_oper?(m)
   end
 
   match(/unload (\S+)/) do |m, plugin|
-    RubyServ::Plugin.unload(plugin, m.user.nickname) if is_oper?(m)
+    RubyServ::Plugin.unload_plugin(plugin, m.user.nickname) if is_oper?(m)
   end
 
   match(/reload (\S+)/) do |m, plugin|
-    RubyServ::Plugin.reload(plugin, m.user.nickname) if is_oper?(m)
+    RubyServ::Plugin.reload_plugin(plugin, m.user.nickname) if is_oper?(m)
   end
 
   match(/join (\S+) (\S+)/) do |m, plugin, channel|
