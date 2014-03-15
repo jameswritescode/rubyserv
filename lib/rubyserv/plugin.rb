@@ -72,10 +72,14 @@ module RubyServ::Plugin
     end
 
     def plugin_already_loaded?(plugin, user)
-      if RubyServ::PLUGINS.include?(Kernel.const_get(plugin))
-        rubyserv.notice(user, "The plugin #{plugin} is already loaded.")
-        true
-      else
+      begin
+        if RubyServ::PLUGINS.include?(Kernel.const_get(plugin))
+          rubyserv.notice(user, "The plugin #{plugin} is already loaded.")
+          true
+        else
+          false
+        end
+      rescue
         false
       end
     end
