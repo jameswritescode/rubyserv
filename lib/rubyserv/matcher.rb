@@ -9,6 +9,8 @@ module RubyServ::Matcher
     end
 
     def call(plugin, type)
+      initialize_matcher_variables_for(plugin)
+
       @data[plugin][type]
     end
 
