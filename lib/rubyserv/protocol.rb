@@ -12,7 +12,7 @@ class RubyServ::Protocol
   # :42AAAABCJ VERSION :0RS
   # :42AAAABCJ PRIVMSG 0RSSR0001 :VERSION
   def handle_version(input)
-    version = "RubyServ #{RubyServ::VERSION} (#{RubyServ.config.rubyserv.hostname} #{RubyServ::REVISION}) https://github.com/jameswritescode/rubyserv"
+    version = "RubyServ #{RubyServ::VERSION} (#{RubyServ.config.rubyserv.hostname} #{RubyServ::REVISION}) https://github.com/rubyserv/rubyserv"
 
     if input =~ /^:(\S+) VERSION :(\S+)$/
       send_raw(":#{$2} 004 #{$1} :#{version}")
