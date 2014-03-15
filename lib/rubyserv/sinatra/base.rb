@@ -17,7 +17,7 @@ class Sinatra::Base
   end
 
   def self.rubyserv_message_object(options = {})
-    RubyServ::Message.new(nil, service: options[:service])
+    RubyServ::Message.new(nil, service: options[:plugin].nickname)
   end
 
   def self.generate_methods_from(plugin)
@@ -34,26 +34,23 @@ class Sinatra::Base
     end
   end
 
-  def self.service(*)
-  end
-
   def self.plugin(*)
   end
 
   def self.inject_plugin_routes(plugin)
-    plugin.web_routes.each do |type, route, block, service|
-      self.send(type.to_sym, route, { plugin: plugin, service: service.nickname }, &block)
+    RubyServ::Matcher.(plugin, :routes).each do |type, route, block|
+      self.send(type.to_sym, route, { plugin: plugin }, &block)
     end
   end
 
   def self.clear_plugin_routes(plugin)
-    plugin.web_routes.each do |web_route|
-      types = [web_route.first.to_s.upcase]
-      types << 'HEAD' if web_route.first == :get
+    RubyServ::Matcher.(plugin, :routes).each do |request_type, route|
+      types = [request_type.to_s.upcase]
+      types << 'HEAD' if request_type == :get
 
       types.each do |type|
         self.routes[type].delete_if do |sinatra_route|
-          self.send(:compile, web_route[1]).first == sinatra_route.first
+          self.send(:compile, route).first == sinatra_route.first
         end
       end
     end
