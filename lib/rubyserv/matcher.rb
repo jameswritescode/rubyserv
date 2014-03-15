@@ -15,7 +15,7 @@ module RubyServ::Matcher
     end
 
     def unregister(plugin)
-      @data[plugin].delete
+      @data.delete(plugin)
     end
 
     def read_matchers(object)
