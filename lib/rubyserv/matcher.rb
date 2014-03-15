@@ -52,10 +52,12 @@ module RubyServ::Matcher
 
     def matchers_for(object)
       matchers = if !object.target.start_with?('#')
-                   @data[object.plugin][:matchers].select { |matcher| !matcher[1][:skip_prefix] }
+                   @data[object.plugin][:matchers].select { |matcher| !matcher[1][:skip_prefix] }.map do |pattern, options, block|
+                     [Regexp.new('\A' + pattern.source), options, block]
+                   end
                  elsif object.message.start_with?(object.plugin.prefix) || object.message =~ /\A#{object.plugin.nickname}(\W|_)/
                    @data[object.plugin][:matchers].map do |pattern, options, block|
-                     [Regexp.new(Regexp.escape(object.plugin.prefix) + pattern.source), options, block]
+                     [Regexp.new('\A' + Regexp.escape(object.plugin.prefix) + pattern.source), options, block]
                    end.select { |matcher| !matcher[1][:skip_prefix] }
                  else
                    []
