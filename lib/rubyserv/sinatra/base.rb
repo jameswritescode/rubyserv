@@ -42,6 +42,8 @@ class Sinatra::Base
   end
 
   def self.inject_plugin_routes(plugin)
+    return if RubyServ::Matcher.(plugin, :routes).empty?
+
     RubyServ::Matcher.(plugin, :routes).each do |type, route, block|
       self.send(type.to_sym, route, { plugin: plugin }, &block)
     end
