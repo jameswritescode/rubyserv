@@ -71,7 +71,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
       )
     elsif input =~ /^SQUIT (\S+) :(.*)$/
       if $1 =~ /(\S{3})/
-        RubyServ::IRC::Server.find_by_sid($1)
+        RubyServ::IRC::Server.find_by_sid($1).destroy
       else
         RubyServ::IRC::Server.find_by_name($1).destroy
       end
