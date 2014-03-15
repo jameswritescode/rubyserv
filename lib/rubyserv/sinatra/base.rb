@@ -30,7 +30,11 @@ class Sinatra::Base
 
   def self.destroy_methods_from(plugin)
     plugin.instance_methods.each do |method|
-      remove_method method.to_sym
+      begin
+        remove_method method.to_sym
+      rescue => ex
+        RubyServ::Logger.warn(ex.message)
+      end
     end
   end
 
