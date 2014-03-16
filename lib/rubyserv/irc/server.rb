@@ -10,8 +10,7 @@ class RubyServ::IRC::Server < RubyServ::IRC::Base
   end
 
   def destroy
-    users = RubyServ::IRC::User.find_by_sid(@sid)
-    users.each { |user| user.destroy }
+    self.users.each { |user| user.destroy }
 
     super
   end
