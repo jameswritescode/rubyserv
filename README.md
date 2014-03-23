@@ -10,6 +10,8 @@ All that said, this is not meant to be a replacement for traditional services li
 
 And **this is in development, it's not perfect**. If you find a problem, please create an issue, or open a pull request. Thanks!
 
+If you have any questions or problems feel free to open an issue or find newton on [irc.freenode.net](http://freenode.net) in #rubyserv.
+
 ### Configuration
 
 Very simple configuration! Copy `etc/rubyserv.yml.example` to `etc/rubyserv.yml` and edit the values.
