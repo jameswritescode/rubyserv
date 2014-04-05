@@ -34,7 +34,7 @@ class RubyServ::IRC::User < RubyServ::IRC::Base
   end
 
   def away?
-    away.nil? ? false : true
+    !away.nil?
   end
 
   def hostmask

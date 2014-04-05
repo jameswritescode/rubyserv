@@ -47,6 +47,6 @@ module Core
   end
 
   def is_oper?(m)
-    m.user.oper? ? true : false
+    m.user.oper?
   end
 end
