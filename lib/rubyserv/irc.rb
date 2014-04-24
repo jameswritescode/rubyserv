@@ -92,6 +92,7 @@ class RubyServ::IRC
     generate_sinatra_routes
 
     Sinatra::Application.set(:port, RubyServ.config.web.port)
+    Sinatra::Application.set(:bind, RubyServ.config.web.ip)
     Sinatra::Application.set(:logging, RubyServ::Logger)
     Sinatra::Application.run!
   end
