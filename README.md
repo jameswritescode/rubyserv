@@ -14,7 +14,7 @@ If you have any questions or problems feel free to open an issue or find newton 
 
 ### Configuration
 
-Very simple configuration! Copy `etc/rubyserv.yml.example` to `etc/rubyserv.yml` and edit the values.
+Very simple configuration! Copy `rubyserv.yml.example` to `rubyserv.yml` and edit the values.
 
 ### Plugins (sevices)
 
