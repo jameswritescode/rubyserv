@@ -15,14 +15,16 @@ If you have any questions or problems feel free to open an issue or find newton 
 ## Installation
 
 ```
-$ bundle --deployment --without development
+$ bundle --path vendor --without development
 ```
 
-Currently SQLite is the only supported database. If you'd like to install RubyServ without SQLite support, use:
+Currently RubyServ has lightweight support for MySQL and SQLite. To install without a specific database, do:
 
 ```
-$ bundle install --deployment --without sqlite
+$ bundle install --path vendor --without <database_name>
 ```
+
+Where `<database_name>` is sqlite or mysql.
 
 ## Configuration
 
