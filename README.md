@@ -18,6 +18,12 @@ If you have any questions or problems feel free to open an issue or find newton 
 $ bundle --deployment --without development
 ```
 
+Currently SQLite is the only supported database. If you'd like to install RubyServ without SQLite support, use:
+
+```
+$ bundle install --deployment --without sqlite
+```
+
 ### Configuration
 
 Very simple configuration! Copy `rubyserv.yml.example` to `rubyserv.yml` and edit the values.

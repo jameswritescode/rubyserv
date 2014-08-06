@@ -11,6 +11,7 @@ gem 'eventmachine'
 gem 'json'
 gem 'webrick'
 
+gem 'sqlite3', group: :sqlite
 
 group :development do
   gem 'rspec'
