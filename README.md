@@ -12,7 +12,7 @@ And **this is in development, it's not perfect**. If you find a problem, please 
 
 If you have any questions or problems feel free to open an issue or find newton on [irc.freenode.net](http://freenode.net) in #rubyserv. A little planning and task keeping is done on [Trello](https://trello.com/b/2sqGDjIT).
 
-### Installation
+## Installation
 
 ```
 $ bundle --deployment --without development
@@ -24,17 +24,17 @@ Currently SQLite is the only supported database. If you'd like to install RubySe
 $ bundle install --deployment --without sqlite
 ```
 
-### Configuration
+## Configuration
 
 Very simple configuration! Copy `rubyserv.yml.example` to `rubyserv.yml` and edit the values.
 
-### Running
+## Running
 
 ```
 $ bundle exec bin/rubyserv
 ```
 
-### Plugins (sevices)
+## Plugins (sevices)
 
 See our [plugins](https://github.com/jameswritescode/rubyserv/tree/master/doc/plugins.md) document and our [RubyServ plugins](https://github.com/jameswritescode/rubyserv-plugins) repository.
 
