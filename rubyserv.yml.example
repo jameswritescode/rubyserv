@@ -21,3 +21,8 @@ web:
   enabled: false
   ip: 0.0.0.0
   port: 1234
+
+db:
+  # drivers available: sqlite3, mysql2
+  driver: sqlite3
+  # other options: user(name), pass(word), host(name), database
