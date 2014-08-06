@@ -12,9 +12,21 @@ And **this is in development, it's not perfect**. If you find a problem, please 
 
 If you have any questions or problems feel free to open an issue or find newton on [irc.freenode.net](http://freenode.net) in #rubyserv. A little planning and task keeping is done on [Trello](https://trello.com/b/2sqGDjIT).
 
+### Installation
+
+```
+$ bundle --deployment --without development
+```
+
 ### Configuration
 
 Very simple configuration! Copy `rubyserv.yml.example` to `rubyserv.yml` and edit the values.
+
+### Running
+
+```
+$ bundle exec bin/rubyserv
+```
 
 ### Plugins (sevices)
 

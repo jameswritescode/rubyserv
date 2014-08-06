@@ -11,8 +11,11 @@ gem 'eventmachine'
 gem 'json'
 gem 'webrick'
 
-gem 'rspec'
-gem 'fakefs'
+
+group :development do
+  gem 'rspec'
+  gem 'fakefs'
+end
 
 # This evals a Gemfile_local file that you can put dependencies for your
 # RubyServ plugins.
