@@ -15,7 +15,7 @@ If you have any questions or problems feel free to open an issue or find newton 
 ### Installation
 
 ```
-$ bundle --deployment --without development
+$ bundle --without development
 ```
 
 ### Configuration
