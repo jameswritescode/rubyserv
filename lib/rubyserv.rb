@@ -11,6 +11,7 @@ require 'sinatra'
 require 'colored'
 require 'json'
 require 'webrick'
+require 'sqlite3'
 
 require_relative 'rubyserv/sinatra/base'
 require_relative 'rubyserv/webrick/log'

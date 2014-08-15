@@ -112,14 +112,6 @@ module RubyServ::Plugin
       @realname = RubyServ.config.rubyserv.realname
       @channels = [RubyServ.config.rubyserv.channel]
       @prefix   = RubyServ.config.rubyserv.prefix
-      @database = nil
-    end
-
-    def database
-      unless @database.nil?
-        @initialized_db = RubyServ::Database.use(@database) unless defined?(@initialized_db)
-        @initialized_db
-      end
     end
 
     def before(method, options = {})
@@ -128,8 +120,18 @@ module RubyServ::Plugin
       RubyServ::Matcher.add(:callback, self, method, options)
     end
 
-    def configure(&block)
+    def configure
       yield self
+    end
+
+    def database_setup
+      return if RubyServ::Database.exist?(@database)
+
+      yield RubyServ::Database.open(@database)
+    end
+
+    def database
+      RubyServ::Database.open(@database)
     end
 
     def client
