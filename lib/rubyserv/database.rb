@@ -18,6 +18,7 @@ class RubyServ::Database
   def create_table(name, columns = {})
     @db.execute <<-SQL
       create table #{name} (
+        id integer primary key autoincrement,
         #{convert_columns(columns)}
       );
     SQL
@@ -34,7 +35,7 @@ class RubyServ::Database
   def get_type(type)
     case type
     when 'String'  then 'text'
-    when 'Integer' then 'int'
+    when 'Integer' then 'integer'
     end
   end
 end
