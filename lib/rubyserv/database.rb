@@ -33,7 +33,7 @@ class RubyServ::Database
 
   def get_type(type)
     case type
-    when 'String'  then 'varchar(256)'
+    when 'String'  then 'text'
     when 'Integer' then 'int'
     end
   end
