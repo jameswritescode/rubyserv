@@ -11,8 +11,8 @@ class RubyServ::Database
     @db = SQLite3::Database.new RubyServ.root.join('data', name).to_s
   end
 
-  def execute(sql)
-    @db.execute(sql)
+  def execute(*args)
+    @db.execute(*args)
   end
 
   def create_table(name, columns = {})
