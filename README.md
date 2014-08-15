@@ -18,13 +18,13 @@ If you have any questions or problems feel free to open an issue or find newton 
 $ bundle --path vendor --without development
 ```
 
-Currently RubyServ has lightweight support for MySQL and SQLite. To install without a specific database, do:
+Currently RubyServ has lightweight support for SQLite. To install without a specific database, do:
 
 ```
 $ bundle install --path vendor --without <database_name>
 ```
 
-Where `<database_name>` is sqlite or mysql.
+Where `<database_name>` is sqlite.
 
 ## Configuration
 

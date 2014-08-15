@@ -12,7 +12,6 @@ gem 'json'
 gem 'webrick'
 
 gem 'sqlite3', group: :sqlite
-gem 'mysql2', group: :mysql
 
 group :development do
   gem 'rspec'
