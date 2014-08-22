@@ -11,7 +11,7 @@ class RubyServ::Protocol::TS6 < RubyServ::Protocol
 
   def authenticate
     send_raw("PASS #{RubyServ.config.link.password_send} TS 6 :#{RubyServ.config.link.sid}")
-    send_raw('CAPAB :QS ENCAP SAVE RSFNC SERVICES REMOVE')
+    send_raw('CAPAB :QS ENCAP SAVE RSFNC SERVICES REMOVE EX IE')
     send_raw("SERVER #{RubyServ.config.rubyserv.hostname} 0 :#{RubyServ.config.link.description}")
   end
 
