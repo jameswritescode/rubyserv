@@ -30,7 +30,6 @@ class RubyServ::Protocol
   def send_raw(text)
     RubyServ::Logger.outgoing text
 
-    sleep(0.05)
-    @socket.puts "#{text}\r"
+    @socket.write "#{text}\r\n"
   end
 end
