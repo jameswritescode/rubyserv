@@ -94,7 +94,7 @@ class RubyServ::IRC::Client < RubyServ::IRC::Base
     send_numeric(from, 311, "#{@nickname} #{@username} #{@hostname} * :#{@realname}")
     send_numeric(from, 312, "#{@nickname} #{RubyServ.config.rubyserv.hostname} :#{RubyServ.config.link.description}")
     send_numeric(from, 313, "#{@nickname} :is a Network Service")
-    send_numeric(from, 318, "#{@nickname.downcase} :End of WHOIS")
+    send_numeric(from, 318, "#{@nickname} :End of /WHOIS list")
   end
 
   class << self
