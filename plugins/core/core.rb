@@ -5,48 +5,50 @@ module Core
     config.nickname = RubyServ.config.rubyserv.nickname
   end
 
-  match(/plugins/) do |m|
-    if is_oper?(m)
-      m.client.notice(m.user.nickname, 'Loaded plugins:')
+  before { |m| m.user.is_oper? }
 
-      RubyServ::PLUGINS.each_with_index do |plugin, index|
-        m.client.notice(m.user.nickname, "#{index}: #{plugin} - nick: #{plugin.client.nickname}")
-      end
+  match(/plugins/, method: :plugins)
+  match(/quit/, method: :quit)
+  match(/load (\S+)/, method: :load)
+  match(/unload (\S+)/, method: :unload)
+  match(/reload (\S+)/, method: :reload)
+  match(/join (\S+) (\S+)/, method: :join)
+  match(/part (\S+) (\S+)/, method: :part)
+
+  def plugins(m)
+    m.client.notice(m.user.nickname, 'Loaded plugins:')
+
+    RubyServ::PLUGINS.each_with_index do |plugin, index|
+      m.client.notice(m.user.nickname, "#{index}: #{plugin} - nick: #{plugin.client.nickname}")
     end
   end
 
-  match(/quit/) do |m|
-    if is_oper?(m)
-      m.client.notice(m.user.nickname, 'Shutting down...')
+  def quit(m)
+    m.client.notice(m.user.nickname, 'Shutting down...')
 
-      RubyServ::PLUGINS.each { |plugin| plugin.client.quit }
-      RubyServ::Plugin.protocol.send_raw("SQUIT :#{RubyServ.config.link.hostname}")
+    RubyServ::PLUGINS.each { |plugin| plugin.client.quit }
+    RubyServ::Plugin.protocol.send_raw("SQUIT :#{RubyServ.config.link.hostname}")
 
-      system("kill -9 #{Process.pid}")
-    end
+    system("kill -9 #{Process.pid}")
   end
 
-  match(/load (\S+)/) do |m, plugin|
-    RubyServ::Plugin.load_plugin(plugin, m.user.nickname) if is_oper?(m)
+  def load(m, plugin)
+    RubyServ::Plugin.load_plugin(plugin, m.user.nickname)
   end
 
-  match(/unload (\S+)/) do |m, plugin|
-    RubyServ::Plugin.unload_plugin(plugin, m.user.nickname) if is_oper?(m)
+  def unload(m, plugin)
+    RubyServ::Plugin.unload_plugin(plugin, m.user.nickname)
   end
 
-  match(/reload (\S+)/) do |m, plugin|
-    RubyServ::Plugin.reload_plugin(plugin, m.user.nickname) if is_oper?(m)
+  def reload(m, plugin)
+    RubyServ::Plugin.reload_plugin(plugin, m.user.nickname)
   end
 
-  match(/join (\S+) (\S+)/) do |m, plugin, channel|
-    m.Client.find_by_nickname(plugin).join(channel) if is_oper?(m)
+  def join(m, plugin, channel)
+    m.Client.find_by_nickname(plugin).join(channel)
   end
 
-  match(/part (\S+) (\S+)/) do |m, plugin, channel|
-    m.Client.find_by_nickname(plugin).part(channel) if is_oper?(m)
-  end
-
-  def is_oper?(m)
-    m.user.oper?
+  def part(m, plugin, channel)
+    m.Client.find_by_nickname(plugin).part(channel)
   end
 end
