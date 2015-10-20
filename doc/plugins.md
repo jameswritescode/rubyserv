@@ -33,16 +33,16 @@ module SomeServ
 end
 ```
 
-## `match(/pattern/, options = {}, &block)`
+## `match(/pattern/, options)`
 
 **Parameters:**
 
 * `/pattern/ (Regexp) (Required)`
-* `options   (Hash)   (Optional)`
-* `&block    (????)   (Required)`
+* `options   (Hash)   (Required)`
 
 **Supported `options`:**
 
+* `method`        (Required)
 * `skip_prefix    (default: false)`
 * `skip_callbacks (default: false)`
 
@@ -52,25 +52,24 @@ end
 module SomeServ
   include RubyServ::Plugin
 
-  # ...
-  match(/some (\S+)/) do |m, param|
+  match(/some (\S+)/, method: :some)
+
+  def some(m, param)
     m.reply "some #{param} called by #{m.user.nickname}"
   end
-  # ...
 end
 ```
 
 When greating groups when in the pattern (in this case, `(\S+)`) match will take a param for each group. So:
 
-`match(/some (\S+) (\S+)/)` would yield you: `|m, first, second|`
+`match(/some (\S+) (\S+)/, method: :some)` would yield you: `def some(m, first, second)`
 
-## `event(event, options = {}, &block)`
+## `event(event, options)`
 
 **Parameters:**
 
 * `event`   (Symbol) (Required)`
 * `options` (Hash)   (Optional)`
-* `&block   (????)   (Required)`
 
 **Supported `options`:**
 
@@ -82,11 +81,11 @@ When greating groups when in the pattern (in this case, `(\S+)`) match will take
 module SomeServ
   include RubyServ::Plugin
 
-  # ...
-  event :privmsg do |m|
-    m.reply "#{m.user.nickname} someone said something!"
+  event(:privmsg, method: :notify)
+
+  def notify(m)
+    m.reply "#{m.user.nickname} said something!"
   end
-  # ...
 end
 ```
 
@@ -106,11 +105,9 @@ end
 module SomeServ
   include RubyServ::Plugin
 
-  # ...
-  web :post, '/testing/:name' do |m, name|
+  web(:post, '/testing/:name') do |m, name|
     m.client.message('#channel', "name: #{name}")
   end
-  # ...
 end
 ```
 
@@ -120,22 +117,22 @@ Additional parameters work like Sinatra's typical `get '/:param' do |param|` as 
 
 Be unique with your routes per service, or you'll be looking at clashes.
 
-## `before(method, options = {})`
+## `before(method, options || &block)`
 
 `before` acts like `before_action` in rails. The the method specified after before is executed before events and matches.
 
 **Parameters:**
 
-* `method  (Symbol) (Required)`
-* `options (Hash)   (Optional)`
+The first parameter can be a method name, or a block. One or the other are
+required. If a block is used, you cannot specify any options.
 
 **Supported `options`:**
 
-* `skip (Array or String) (Optional)`
+* `only   (Array or String) (Optional)`
+* `except (Array or String) (Optional)`
 
-`skip` can take these values: `matchers`, `events`
+`only` and `except` act like the rails versions, too.
 
-It can be an array or string, however specifying both types will pretty much make the `before` useless anyway.
 
 **Example:**
 
@@ -143,16 +140,14 @@ It can be an array or string, however specifying both types will pretty much mak
 module SomeServ
   include RubyServ::Plugin
 
-  before :init
-  before :init, skip: :events
-  before :init, skip: [:events, :matchers]
+  before :is_oper?, only: :quit
 
-  match(/.../) do |m|
-    # ...
+  def is_oper?(m)
+    m.user.oper?
   end
 
-  def init
-    # ...
+  before do |m|
+    m.user.admin?
   end
 end
 ```
