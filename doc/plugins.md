@@ -96,8 +96,8 @@ end
 **Parameters:**
 
 * `request_type (Symbol) (Required)`
-* `route`       (String) (Required)`
-* `&block`      (????)   (Required)`
+* `route        (String) (Required)`
+* `&block       (????)   (Required)`
 
 **Example:**
 
